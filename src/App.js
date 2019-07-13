@@ -15,7 +15,7 @@ function App() {
   ];
   return (
     <div style = {{margin: 48}}>
-      <MYYCarousel>
+      <MYYCarousel startIndex = {0}>
         {lista.map((data) => {
           return (
             <div className = "item" key = {data.content} style = {{backgroundColor: data.color, fontSize: '6rem', height: '100%'}}>

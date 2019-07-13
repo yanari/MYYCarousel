@@ -1,0 +1,27 @@
+.myy-carousel__dots-container {
+  margin-top: 8px;
+  text-align: center;
+}
+
+.myy-carousel__dots-container > .myy-carousel__dot-button {
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.myy-carousel__dots-container > .myy-carousel__dot-button:last-child {
+  margin-right: 0;
+}
+
+.myy-carousel__dots-container > .myy-carousel__dot-button > .myy-carousel__dot {
+  background: #848484;
+  border-radius: 50%;
+  height: 8px;
+  width: 8px;
+}
+
+.myy-carousel__dots-container > .myy-carousel__dot-button:hover > .myy-carousel__dot,
+.myy-carousel__dots-container > .myy-carousel__dot-button > .myy-carousel__dot.active {
+  background: #c5ab71;
+  height: 10px;
+  width: 10px;
+}
