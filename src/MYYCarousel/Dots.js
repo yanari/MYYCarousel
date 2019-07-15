@@ -18,6 +18,7 @@ function Dots (props) {
             className = "myy-carousel__dot-button"
             key = {data.key}
             onClick = {() => setCarouselIndex(index)}
+            type = "button"
           >
             <div className = {cn('myy-carousel__dot', {'active': index === carouselIndex})}/>
           </button>

@@ -13,17 +13,19 @@ function App() {
     {color: 'rgb(0, 200, 200)', content: 'G'},
     {color: 'rgb(50, 132, 200)', content: 'H'},
   ];
+  const itemRenderer = ({data}) => {
+    return (
+      <div className = "item" key = {data.content} style = {{backgroundColor: data.color, fontSize: '6rem', height: '100%'}}>
+        {data.content}
+      </div>
+    );
+  };
   return (
     <div style = {{margin: 48}}>
-      <MYYCarousel startIndex = {0}>
-        {lista.map((data) => {
-          return (
-            <div className = "item" key = {data.content} style = {{backgroundColor: data.color, fontSize: '6rem', height: '100%'}}>
-              {data.content}
-            </div>
-          );
-        })}
-      </MYYCarousel>
+      <MYYCarousel
+        itemRenderer = {itemRenderer}
+        items = {lista}
+      />
     </div>
   );
 }
