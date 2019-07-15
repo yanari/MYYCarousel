@@ -40,8 +40,9 @@ class MYYCarousel extends Component {
   handleTouchEnd = (e) => {
     const {children} = this.props;
     const deltaX = e.changedTouches[0].clientX - this.state.initialPositionX;
-    const canBeSwipedRight = this.state.carouselIndex > 0;
-    const canBeSwipedLeft = this.state.carouselIndex < children.length - 1;
+    const threshold = this.state.itemsWidth / 2;
+    const canBeSwipedRight = this.state.carouselIndex > 0 && Math.abs(deltaX) >= threshold;
+    const canBeSwipedLeft = this.state.carouselIndex < children.length - 1 && Math.abs(deltaX) >= threshold;
     if (deltaX > 0 && canBeSwipedRight) {
       this.setState((prevState) => {
         return {carouselIndex: prevState.carouselIndex - 1};
@@ -54,9 +55,7 @@ class MYYCarousel extends Component {
     this.setState({initialPositionX: 0, positionX: 0}); // reseta os valores
   };
 
-  setCarouselIndex = (carouselIndex) => {
-    this.setState({carouselIndex});
-  };
+  setCarouselIndex = (carouselIndex) => {this.setState({carouselIndex})};
 
   render () {
     const {children} = this.props;

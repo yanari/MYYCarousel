@@ -27,4 +27,10 @@ function Dots (props) {
   );
 }
 
+Dots.propTypes = {
+  carouselIndex: PropTypes.number,
+  items: PropTypes.node,
+  setCarouselIndex: PropTypes.func,
+};
+
 export default Dots;
