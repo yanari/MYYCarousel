@@ -2,6 +2,7 @@ import './index.css';
 
 import React, {Component, createRef} from 'react';
 import PropTypes from 'prop-types';
+import CarouselItem from './CarouselItem';
 import Dots from './Dots';
 
 class MYYCarousel extends Component {
@@ -41,13 +42,14 @@ class MYYCarousel extends Component {
     const {children} = this.props;
     const deltaX = e.changedTouches[0].clientX - this.state.initialPositionX;
     const threshold = this.state.itemsWidth / 2;
-    const canBeSwipedRight = this.state.carouselIndex > 0 && Math.abs(deltaX) >= threshold;
-    const canBeSwipedLeft = this.state.carouselIndex < children.length - 1 && Math.abs(deltaX) >= threshold;
-    if (deltaX > 0 && canBeSwipedRight) {
+    const isValidSwipe = Math.abs(deltaX) >= threshold;
+    const canBeSwipedRight = this.state.carouselIndex > 0;
+    const canBeSwipedLeft = this.state.carouselIndex < children.length - 1;
+    if (deltaX > 0 && canBeSwipedRight && isValidSwipe) {
       this.setState((prevState) => {
         return {carouselIndex: prevState.carouselIndex - 1};
       });
-    } else if (deltaX < 0 && canBeSwipedLeft) {
+    } else if (deltaX < 0 && canBeSwipedLeft && isValidSwipe) {
       this.setState((prevState) => {
         return {carouselIndex: prevState.carouselIndex + 1};
       });
@@ -73,13 +75,11 @@ class MYYCarousel extends Component {
         >
           {children.map((data) => {
             return (
-              <div
-                className = "myy-carousel__item"
+              <CarouselItem
+                data = {data}
                 key = {data.key}
-                style = {{width: this.state.itemsWidth}}
-              >
-                {data}
-              </div>
+                width = {this.state.itemsWidth}
+              />
             );
           })}
         </div>

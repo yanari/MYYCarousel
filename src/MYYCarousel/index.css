@@ -4,10 +4,7 @@
 
 .myy-carousel > .myy-carousel__wrapper {
   display: block;
-  width: 100%;
-}
-
-.myy-carousel > .myy-carousel__wrapper > .myy-carousel__item {
-  display: inline-block;
+  margin-left: 0;
+  transition: all 0.1s ease-in-out;
   width: 100%;
 }
