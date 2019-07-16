@@ -44,7 +44,6 @@ class MYYCarousel extends Component {
     const threshold = this.state.itemsWidth / 2;
     // impedir que o usuario swipe pro lado esquerdo qd é o ultimo item e pro lado direito quando é o primeiro item
     if (!canBeSwipedLeft && deltaX < -threshold) {
-      console.log(deltaX);
       this.setState({positionX: -threshold});
       return;
     }
@@ -65,8 +64,8 @@ class MYYCarousel extends Component {
   handleTouchEnd = (e) => {
     const {items} = this.props;
     const deltaX = e.changedTouches[0].clientX - this.state.initialPositionX;
-    const threshold = this.state.itemsWidth / 2; // tem que ser no minimo metade do container pra mudar de indice
-    const isValidSwipe = Math.abs(deltaX) >= threshold;
+    const threshold = this.state.itemsWidth / 2; // movimento minimo pra ser considerado um swipe
+    const isValidSwipe = Math.abs(deltaX) >= threshold; // tem que ser no minimo metade do container pra mudar de indice
     const canBeSwipedRight = this.state.carouselIndex > 0; // nao é o ultimo item
     const canBeSwipedLeft = this.state.carouselIndex < items.length - 1; // náo é o primeiro item
     if (deltaX > 0 && canBeSwipedRight && isValidSwipe) { // delta positivo quer dizer que foi swipado pra direita
@@ -103,11 +102,11 @@ class MYYCarousel extends Component {
           onTouchStart = {this.handleTouchStart}
           style = {wrapperStyle}
         >
-          {items.map((data) => {
+          {items.map((data, index) => {
             return (
               <div
                 className = "myy-carousel__item"
-                key = {data.key}
+                key = {index}
                 style = {{width: this.state.itemsWidth}}
               >
                 {itemRenderer({data})}
@@ -127,7 +126,7 @@ class MYYCarousel extends Component {
 
 MYYCarousel.propTypes = {
   itemRenderer: PropTypes.func.isRequired,
-  items: PropTypes.node.isRequired,
+  items: PropTypes.instanceOf(Object).isRequired,
   startIndex: PropTypes.number,
 };
 

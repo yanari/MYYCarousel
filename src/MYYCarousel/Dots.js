@@ -16,7 +16,7 @@ function Dots (props) {
         return (
           <button
             className = "myy-carousel__dot-button"
-            key = {data.key}
+            key = {index}
             onClick = {() => setCarouselIndex(index)}
             type = "button"
           >
@@ -29,9 +29,9 @@ function Dots (props) {
 }
 
 Dots.propTypes = {
-  carouselIndex: PropTypes.number,
-  items: PropTypes.node,
-  setCarouselIndex: PropTypes.func,
+  carouselIndex: PropTypes.number.isRequired,
+  items: PropTypes.instanceOf(Object).isRequired,
+  setCarouselIndex: PropTypes.func.isRequired,
 };
 
 export default Dots;
