@@ -41,13 +41,15 @@ class MYYCarousel extends Component {
     const deltaX = e.changedTouches[0].clientX - this.state.initialPositionX;
     const canBeSwipedLeft = this.state.carouselIndex < items.length - 1; // náo é o primeiro item
     const canBeSwipedRight = this.state.carouselIndex > 0; // nao é o ultimo item
+    const threshold = this.state.itemsWidth / 2;
     // impedir que o usuario swipe pro lado esquerdo qd é o ultimo item e pro lado direito quando é o primeiro item
-    if (!canBeSwipedLeft && deltaX < 0) {
-      this.setState({positionX: 0});
+    if (!canBeSwipedLeft && deltaX < -threshold) {
+      console.log(deltaX);
+      this.setState({positionX: -threshold});
       return;
     }
-    if (!canBeSwipedRight && deltaX > 0) {
-      this.setState({positionX: 0});
+    if (!canBeSwipedRight && deltaX > threshold) {
+      this.setState({positionX: threshold});
       return;
     }
     e.persist();
