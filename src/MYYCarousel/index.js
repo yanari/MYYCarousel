@@ -37,11 +37,24 @@ class MYYCarousel extends Component {
   };
 
   handleTouchMove = (e) => {
-    // acompanha pra onde o cursor ou dedo ta indo, tira qualquer margem ou padding que possa existir e subtrai a
-    // diferença entre onde o cursor/dedo tava na hora do touchstart e a esquerda do container
+    const {items} = this.props;
+    const deltaX = e.changedTouches[0].clientX - this.state.initialPositionX;
+    const canBeSwipedLeft = this.state.carouselIndex < items.length - 1; // náo é o primeiro item
+    const canBeSwipedRight = this.state.carouselIndex > 0; // nao é o ultimo item
+    // impedir que o usuario swipe pro lado esquerdo qd é o ultimo item e pro lado direito quando é o primeiro item
+    if (!canBeSwipedLeft && deltaX < 0) {
+      this.setState({positionX: 0});
+      return;
+    }
+    if (!canBeSwipedRight && deltaX > 0) {
+      this.setState({positionX: 0});
+      return;
+    }
     e.persist();
     this.setState((prevState) => {
       return {
+        // acompanha pra onde o cursor ou dedo ta indo, tira qualquer margem ou padding que possa existir e subtrai a
+        // diferença entre onde o cursor/dedo tava na hora do touchstart e a esquerda do container
         positionX: ((e.touches[0].clientX - this.refContainer.current.offsetLeft) - prevState.offsetCursor),
       };
     });
