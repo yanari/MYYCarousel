@@ -8,6 +8,7 @@ import CarouselDots from './CarouselDots';
 class MYYCarousel extends Component {
   constructor (props) {
     super(props);
+    this.refContainer = createRef();
     this.state = {
       carouselIndex: props.startIndex,
       initialPositionX: null, // pra calcular o delta (se o swipe é pra direita ou esquerda)
@@ -15,7 +16,6 @@ class MYYCarousel extends Component {
       offsetCursor: null, // distancia entre o cursor e a esquerda no touch start pra n ter o problema da borda do item acompanhar o cursor
       positionX: null, // onde o cursor ta no eixo X + a a distancia entre o cursor e a esquerda
     };
-    this.refContainer = createRef();
   }
 
   componentDidMount () {
@@ -108,26 +108,30 @@ class MYYCarousel extends Component {
     };
     return (
       <div className = "myy-carousel" ref = {this.refContainer}>
-        <CarouselArrow direction = "left" handleClick = {this.handleDecrementIndex}/>
-        <CarouselArrow direction = "right" handleClick = {this.handleIncrementIndex}/>
-        <div
-          className = "myy-carousel__items-container"
-          onTouchEnd = {this.handleTouchEnd}
-          onTouchMove = {this.handleTouchMove}
-          onTouchStart = {this.handleTouchStart}
-          style = {wrapperStyle}
-        >
-          {items.map((data, index) => {
-            return (
-              <div
-                className = "myy-carousel__item"
-                key = {index}
-                style = {{width: this.state.itemsWidth}}
-              >
-                {itemRenderer({data})}
-              </div>
-            );
-          })}
+        <div className = "myy-carousel__flex-container">
+          <CarouselArrow direction = "left" handleClick = {this.handleDecrementIndex}/>
+          <div className = "myy-carousel__items-container-wrapper" style = {{width: this.state.itemsWidth}}>
+            <div
+              className = "myy-carousel__items-container"
+              onTouchEnd = {this.handleTouchEnd}
+              onTouchMove = {this.handleTouchMove}
+              onTouchStart = {this.handleTouchStart}
+              style = {wrapperStyle}
+            >
+              {items.map((data, index) => {
+                return (
+                  <div
+                    className = "myy-carousel__item"
+                    key = {index}
+                    style = {{width: this.state.itemsWidth}}
+                  >
+                    {itemRenderer({data})}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <CarouselArrow direction = "right" handleClick = {this.handleIncrementIndex}/>
         </div>
         <CarouselDots
           carouselIndex = {this.state.carouselIndex}

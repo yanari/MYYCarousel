@@ -1,35 +1,29 @@
 .myy-carousel {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.myy-carousel > .myy-carousel__flex-container {
+  display: flex;
+}
+
+.myy-carousel > .myy-carousel__flex-container > .myy-carousel__arrow-button > .svg-icon > svg {
+  height: 32px;
+  width: 32px;
+}
+
+.myy-carousel > .myy-carousel__flex-container > .myy-carousel__items-container-wrapper {
+  flex: none; /* se não se ajusta ao flex container e nao é o que eu quero */
   overflow: hidden;
-  position: relative;
 }
 
-.myy-carousel > .myy-carousel__arrow-button {
-  position: absolute;
-  top: 35%;
-}
-
-.myy-carousel > .myy-carousel__arrow-button > .svg-icon > svg {
-  height: 24px;
-  width: 24px;
-}
-
-.myy-carousel > .myy-carousel__arrow-button--left {
-  left: 0;
-}
-
-.myy-carousel > .myy-carousel__arrow-button--right {
-  right: 0;
-}
-
-.myy-carousel > .myy-carousel__items-container {
-  display: block;
-  flex: none;
-  margin-left: 0;
+.myy-carousel > .myy-carousel__flex-container > .myy-carousel__items-container-wrapper > .myy-carousel__items-container {
   transition: all 0.1s cubic-bezier(0.05, 0.26, 0.25, 0.74);
 }
 
-.myy-carousel > .myy-carousel__items-container > .myy-carousel__item {
+.myy-carousel > .myy-carousel__flex-container > .myy-carousel__items-container-wrapper > .myy-carousel__items-container > .myy-carousel__item {
   display: inline-block;
   vertical-align: top;
-  width: 100%;
 }
