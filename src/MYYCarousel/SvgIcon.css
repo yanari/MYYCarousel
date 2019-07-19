@@ -1,0 +1,64 @@
+.svg-icon {
+  display: inline-block;
+  font-style: normal;
+  line-height: 0;
+  white-space: nowrap;
+}
+
+.svg-icon > svg {
+  display: inline-block;
+  fill: currentColor;
+  height: 1em;
+  vertical-align: text-bottom;
+  width: 1em;
+}
+
+.svg-icon > svg > use {
+  pointer-events: none;
+}
+
+.svg-icon > .icon-linecons-clock {
+  height: 1.1rem;
+  width: 1.1rem;
+}
+
+.svg-icon > abbr {
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.svg-icon.spin-please {
+  animation-duration: 2000ms;
+  animation-iteration-count: infinite;
+  animation-name: spin;
+  animation-timing-function: linear;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1.2);
+  }
+  50% {
+    transform: scale(0.8);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.svg-icon .icon-linecons-heart:hover {
+  animation-delay: 1s;
+  animation-duration: 1000ms;
+  animation-iteration-count: infinite;
+  animation-name: pulse;
+  animation-timing-function: linear;
+}

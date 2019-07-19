@@ -2,7 +2,8 @@ import './index.css';
 
 import React, {Component, createRef} from 'react';
 import PropTypes from 'prop-types';
-import Dots from './Dots';
+import CarouselArrow from './CarouselArrow';
+import CarouselDots from './CarouselDots';
 
 class MYYCarousel extends Component {
   constructor (props) {
@@ -62,29 +63,41 @@ class MYYCarousel extends Component {
   };
 
   handleTouchEnd = (e) => {
-    const {items} = this.props;
     const deltaX = e.changedTouches[0].clientX - this.state.initialPositionX;
     const threshold = this.state.itemsWidth / 2; // movimento minimo pra ser considerado um swipe
     const isValidSwipe = Math.abs(deltaX) >= threshold; // tem que ser no minimo metade do container pra mudar de indice
-    const canBeSwipedRight = this.state.carouselIndex > 0; // nao é o ultimo item
-    const canBeSwipedLeft = this.state.carouselIndex < items.length - 1; // náo é o primeiro item
-    if (deltaX > 0 && canBeSwipedRight && isValidSwipe) { // delta positivo quer dizer que foi swipado pra direita
-      this.setState((prevState) => {
-        return {
-          carouselIndex: prevState.carouselIndex - 1,
-        };
-      });
-    } else if (deltaX < 0 && canBeSwipedLeft && isValidSwipe) { // delta negativo indica que foi swipado pra esquerda
+    if (deltaX > 0 && isValidSwipe) { // delta positivo quer dizer que foi swipado pra direita
+      this.handleDecrementIndex();
+    } else if (deltaX < 0 && isValidSwipe) { // delta negativo indica que foi swipado pra esquerda
+      this.handleIncrementIndex();
+    }
+    this.setState({
+      initialPositionX: 0,
+      positionX: 0,
+    }); // reseta os valores
+  };
+
+  handleIncrementIndex = () => {
+    const {items} = this.props;
+    const isNotLastItem = this.state.carouselIndex < items.length - 1;
+    if (isNotLastItem) {
       this.setState((prevState) => {
         return {
           carouselIndex: prevState.carouselIndex + 1,
         };
       });
     }
-    this.setState({
-      initialPositionX: 0,
-      positionX: 0,
-    }); // reseta os valores
+  };
+
+  handleDecrementIndex = () => {
+    const isNotFirstItem = this.state.carouselIndex > 0;
+    if (isNotFirstItem) {
+      this.setState((prevState) => {
+        return {
+          carouselIndex: prevState.carouselIndex - 1,
+        };
+      });
+    }
   };
 
   render () {
@@ -95,8 +108,10 @@ class MYYCarousel extends Component {
     };
     return (
       <div className = "myy-carousel" ref = {this.refContainer}>
+        <CarouselArrow direction = "left" handleClick = {this.handleDecrementIndex}/>
+        <CarouselArrow direction = "right" handleClick = {this.handleIncrementIndex}/>
         <div
-          className = "myy-carousel__wrapper"
+          className = "myy-carousel__items-container"
           onTouchEnd = {this.handleTouchEnd}
           onTouchMove = {this.handleTouchMove}
           onTouchStart = {this.handleTouchStart}
@@ -114,7 +129,7 @@ class MYYCarousel extends Component {
             );
           })}
         </div>
-        <Dots
+        <CarouselDots
           carouselIndex = {this.state.carouselIndex}
           items = {items}
           setCarouselIndex = {this.setCarouselIndex}

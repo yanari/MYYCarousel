@@ -1,10 +1,10 @@
-import './Dots.css';
+import './CarouselDots.css';
 
 import React from 'react';
 import cn from 'classnames';
 import PropTypes from 'prop-types';
 
-function Dots (props) {
+function CarouselDots (props) {
   const {
     carouselIndex,
     items,
@@ -28,10 +28,10 @@ function Dots (props) {
   );
 }
 
-Dots.propTypes = {
+CarouselDots.propTypes = {
   carouselIndex: PropTypes.number.isRequired,
   items: PropTypes.instanceOf(Object).isRequired,
   setCarouselIndex: PropTypes.func.isRequired,
 };
 
-export default Dots;
+export default CarouselDots;

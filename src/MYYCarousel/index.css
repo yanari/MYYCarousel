@@ -1,15 +1,34 @@
 .myy-carousel {
   overflow: hidden;
+  position: relative;
 }
 
-.myy-carousel > .myy-carousel__wrapper {
+.myy-carousel > .myy-carousel__arrow-button {
+  position: absolute;
+  top: 35%;
+}
+
+.myy-carousel > .myy-carousel__arrow-button > .svg-icon > svg {
+  height: 24px;
+  width: 24px;
+}
+
+.myy-carousel > .myy-carousel__arrow-button--left {
+  left: 0;
+}
+
+.myy-carousel > .myy-carousel__arrow-button--right {
+  right: 0;
+}
+
+.myy-carousel > .myy-carousel__items-container {
   display: block;
+  flex: none;
   margin-left: 0;
   transition: all 0.1s cubic-bezier(0.05, 0.26, 0.25, 0.74);
-  width: 100%;
 }
 
-.myy-carousel > .myy-carousel__wrapper > .myy-carousel__item {
+.myy-carousel > .myy-carousel__items-container > .myy-carousel__item {
   display: inline-block;
   vertical-align: top;
   width: 100%;
