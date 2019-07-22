@@ -13,15 +13,15 @@ class MYYCarousel extends Component {
       carouselIndex: props.startIndex,
       initialPositionX: null, // pra calcular o delta (se o swipe é pra direita ou esquerda)
       itemsWidth: null, // nao consegui passar pro render pq o ref n ta pronto quando renderiza ainda
-      touchEnd: false,
       offsetCursor: null, // distancia entre o cursor e a esquerda no touch start pra n ter o problema da borda do item acompanhar o cursor
       positionX: null, // onde o cursor ta no eixo X + a a distancia entre o cursor e a esquerda
+      touchEnd: false,
     };
   }
 
   componentDidMount () {
     this.setState({
-      itemsWidth: this.refContainer.current.getBoundingClientRect().width,
+      itemsWidth: this.refContainer.current.getBoundingClientRect().width - 64, // tamanho das duas setas
     });
   }
 
@@ -46,11 +46,15 @@ class MYYCarousel extends Component {
     const threshold = this.state.itemsWidth / 2;
     // impedir que o usuario swipe pro lado esquerdo qd é o ultimo item e pro lado direito quando é o primeiro item
     if (!canBeSwipedLeft && deltaX < -threshold) {
-      this.setState({positionX: -threshold});
+      this.setState({
+        positionX: -threshold,
+      });
       return;
     }
     if (!canBeSwipedRight && deltaX > threshold) {
-      this.setState({positionX: threshold});
+      this.setState({
+        positionX: threshold,
+      });
       return;
     }
     e.persist();
