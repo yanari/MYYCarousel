@@ -13,6 +13,7 @@ class MYYCarousel extends Component {
       carouselIndex: props.startIndex,
       initialPositionX: null, // pra calcular o delta (se o swipe é pra direita ou esquerda)
       itemsWidth: null, // nao consegui passar pro render pq o ref n ta pronto quando renderiza ainda
+      touchEnd: false,
       offsetCursor: null, // distancia entre o cursor e a esquerda no touch start pra n ter o problema da borda do item acompanhar o cursor
       positionX: null, // onde o cursor ta no eixo X + a a distancia entre o cursor e a esquerda
     };
@@ -63,8 +64,17 @@ class MYYCarousel extends Component {
   };
 
   handleTouchEnd = (e) => {
+    this.setState({
+      touchEnd: true,
+    }, () => {
+      setTimeout(() => {
+        this.setState({
+          touchEnd: false,
+        });
+      }, 275);
+    });
     const deltaX = e.changedTouches[0].clientX - this.state.initialPositionX;
-    const threshold = this.state.itemsWidth / 2; // movimento minimo pra ser considerado um swipe
+    const threshold = this.state.itemsWidth / 4; // movimento minimo pra ser considerado um swipe
     const isValidSwipe = Math.abs(deltaX) >= threshold; // tem que ser no minimo metade do container pra mudar de indice
     if (deltaX > 0 && isValidSwipe) { // delta positivo quer dizer que foi swipado pra direita
       this.handleDecrementIndex();
@@ -105,6 +115,7 @@ class MYYCarousel extends Component {
     const transition = (-(this.state.itemsWidth * this.state.carouselIndex) + this.state.positionX);
     const wrapperStyle = {
       transform: `translate3d(${transition}px, 0, 0)`, // o que indica a posição
+      transition: this.state.touchEnd ? 'transform 275ms ease' : null,
       width: this.state.itemsWidth * items.length, // pra acomodar todos os itens horizontalmente um do lado do outro
     };
     return (
