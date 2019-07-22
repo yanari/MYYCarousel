@@ -98,7 +98,14 @@ class MYYCarousel extends Component {
       this.setState((prevState) => {
         return {
           carouselIndex: prevState.carouselIndex + 1,
+          touchEnd: true,
         };
+      }, () => {
+        setTimeout(() => {
+          this.setState({
+            touchEnd: false,
+          });
+        }, 275);
       });
     }
   };
@@ -109,7 +116,14 @@ class MYYCarousel extends Component {
       this.setState((prevState) => {
         return {
           carouselIndex: prevState.carouselIndex - 1,
+          touchEnd: true,
         };
+      }, () => {
+        setTimeout(() => {
+          this.setState({
+            touchEnd: false,
+          });
+        }, 275);
       });
     }
   };
