@@ -21,7 +21,7 @@ function App() {
     );
   };
   return (
-    <div>
+    <div style = {{marginTop: 48}}>
       <MYYCarousel
         itemRenderer = {itemRenderer}
         items = {lista}
