@@ -15,7 +15,7 @@ class MYYCarousel extends Component {
       itemsWidth: null, // nao consegui passar pro render pq o ref n ta pronto quando renderiza ainda
       offsetCursor: null, // distancia entre o cursor e a esquerda no touch start pra n ter o problema da borda do item acompanhar o cursor
       positionX: null, // onde o cursor ta no eixo X + a a distancia entre o cursor e a esquerda
-      touchEnd: false,
+      touchEnd: false, // state pra rodar a animacao
     };
   }
 
@@ -43,7 +43,7 @@ class MYYCarousel extends Component {
     const deltaX = e.changedTouches[0].clientX - this.state.initialPositionX;
     const canBeSwipedLeft = this.state.carouselIndex < items.length - 1; // náo é o primeiro item
     const canBeSwipedRight = this.state.carouselIndex > 0; // nao é o ultimo item
-    const threshold = this.state.itemsWidth / 2;
+    const threshold = this.state.itemsWidth / 4;
     // impedir que o usuario swipe pro lado esquerdo qd é o ultimo item e pro lado direito quando é o primeiro item
     if (!canBeSwipedLeft && deltaX < -threshold) {
       this.setState({
@@ -133,7 +133,7 @@ class MYYCarousel extends Component {
     const transition = (-(this.state.itemsWidth * this.state.carouselIndex) + this.state.positionX);
     const wrapperStyle = {
       transform: `translate3d(${transition}px, 0, 0)`, // o que indica a posição
-      transition: this.state.touchEnd ? 'transform 275ms ease' : null,
+      transition: this.state.touchEnd ? 'transform 275ms ease' : null, // anima so no touch end
       width: this.state.itemsWidth * items.length, // pra acomodar todos os itens horizontalmente um do lado do outro
     };
     return (
