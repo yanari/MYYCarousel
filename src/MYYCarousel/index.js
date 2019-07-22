@@ -102,8 +102,9 @@ class MYYCarousel extends Component {
 
   render () {
     const {itemRenderer, items} = this.props;
+    const transition = (-(this.state.itemsWidth * this.state.carouselIndex) + this.state.positionX);
     const wrapperStyle = {
-      marginLeft: (-(this.state.itemsWidth * this.state.carouselIndex) + this.state.positionX), // o que indica a posição
+      transform: `translate3d(${transition}px, 0, 0)`, // o que indica a posição
       width: this.state.itemsWidth * items.length, // pra acomodar todos os itens horizontalmente um do lado do outro
     };
     return (

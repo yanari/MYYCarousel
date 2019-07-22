@@ -1,7 +1,8 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import SvgIcon from './SvgIcon';
 
-function CarouselArrow ({handleClick, direction}) {
+function CarouselArrow ({direction, handleClick}) {
   const buttonStyle = {
     marginLeft: direction === 'right' ? 8 : null,
     marginRight: direction === 'left' ? 8 : null,
@@ -17,5 +18,10 @@ function CarouselArrow ({handleClick, direction}) {
     </button>
   );
 }
+
+CarouselArrow.propTypes = {
+  direction: PropTypes.oneOf(['left', 'right']),
+  handleClick: PropTypes.func,
+};
 
 export default CarouselArrow;
