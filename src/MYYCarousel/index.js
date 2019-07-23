@@ -17,7 +17,7 @@ class MYYCarousel extends Component {
       itemsWidth: null, // nao consegui passar pro render pq o ref n ta pronto quando renderiza ainda
       offsetCursor: null, // distancia entre o cursor e a esquerda no touch start pra n ter o problema da borda do item acompanhar o cursor
       positionX: null, // onde o cursor ta no eixo X + a a distancia entre o cursor e a esquerda
-      touchEnd: false, // state pra rodar a animacao
+      animate: false, // state pra rodar a animacao
     };
   }
 
@@ -28,7 +28,16 @@ class MYYCarousel extends Component {
   }
 
   setCarouselIndex = (carouselIndex) => {
-    this.setState({carouselIndex});
+    this.setState({
+      animate: true,
+      carouselIndex,
+    }, () => {
+      setTimeout(() => {
+        this.setState({
+          animate: false,
+        });
+      }, 275);
+    });
   };
 
   handleTouchStart = (e) => {
@@ -71,11 +80,11 @@ class MYYCarousel extends Component {
 
   handleTouchEnd = (e) => {
     this.setState({
-      touchEnd: true,
+      animate: true,
     }, () => {
       setTimeout(() => {
         this.setState({
-          touchEnd: false,
+          animate: false,
         });
       }, 275);
     });
@@ -100,12 +109,12 @@ class MYYCarousel extends Component {
       this.setState((prevState) => {
         return {
           carouselIndex: prevState.carouselIndex + 1,
-          touchEnd: true,
+          animate: true,
         };
       }, () => {
         setTimeout(() => {
           this.setState({
-            touchEnd: false,
+            animate: false,
           });
         }, 275);
       });
@@ -118,12 +127,12 @@ class MYYCarousel extends Component {
       this.setState((prevState) => {
         return {
           carouselIndex: prevState.carouselIndex - 1,
-          touchEnd: true,
+          animate: true,
         };
       }, () => {
         setTimeout(() => {
           this.setState({
-            touchEnd: false,
+            animate: false,
           });
         }, 275);
       });
@@ -135,7 +144,7 @@ class MYYCarousel extends Component {
     const transition = (-(this.state.itemsWidth * this.state.carouselIndex) + this.state.positionX);
     const wrapperStyle = {
       transform: `translate3d(${transition}px, 0, 0)`, // o que indica a posição
-      transition: this.state.touchEnd ? 'transform 275ms ease' : null, // anima so no touch end
+      transition: this.state.animate ? 'transform 275ms ease' : null, // anima so no touch end
       width: this.state.itemsWidth * items.length, // pra acomodar todos os itens horizontalmente um do lado do outro
     };
     return (
