@@ -72,7 +72,6 @@ class MYYCarousel extends Component {
       });
       return;
     }
-    console.log(deltaX);
     if (Math.abs(deltaY) > 10) {
       this.setState({
         isScrolling: true,
@@ -87,6 +86,7 @@ class MYYCarousel extends Component {
       });
     }
     if (this.state.isSwiping) {
+      this.handleDisableBodyScroll();
       e.persist();
       this.setState((prevState) => {
         return {
@@ -118,6 +118,7 @@ class MYYCarousel extends Component {
         this.handleIncrementIndex();
       }
     }
+    this.handleEnableBodyScroll();
     this.setState({
       initialPositionX: 0,
       positionX: 0,
@@ -164,16 +165,13 @@ class MYYCarousel extends Component {
   };
 
   handleDisableBodyScroll = () => {
-    const preventDefault = e => {
-      e = e || window.event;
-      if (e.preventDefault) e.preventDefault();
-      e.returnValue = false;
-    };
-    window.ontouchmove = preventDefault;
+    document.body.style.overflow = 'hidden';
+    document.body.style.webkitOverflowScrolling = 'touch'; // Previne a rolagem do body no iOS
   };
 
   handleEnableBodyScroll = () => {
-    window.ontouchmove = null;
+    document.body.style.overflow = 'auto';
+    document.body.style.webkitOverflowScrolling = 'auto';
   };
 
   render () {
