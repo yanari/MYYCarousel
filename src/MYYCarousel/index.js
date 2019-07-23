@@ -68,7 +68,6 @@ class MYYCarousel extends Component {
       return;
     }
     const returnedState = handleScrollOrSwipe(e, this.state);
-    if (!returnedState) return;
     this.setState(returnedState);
     if (this.state.isSwiping) {
       handleDisableBodyScroll();

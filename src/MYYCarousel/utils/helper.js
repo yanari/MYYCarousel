@@ -1,11 +1,10 @@
 export const handleDisableBodyScroll = () => {
   document.body.style.overflow = 'hidden';
-  document.body.style.webkitOverflowScrolling = 'touch'; // Previne a rolagem do body no iOS
+  
 };
 
 export const handleEnableBodyScroll = () => {
   document.body.style.overflow = 'auto';
-  document.body.style.webkitOverflowScrolling = 'auto';
 };
 
 export const handleScrollOrSwipe = (e, state) => {
