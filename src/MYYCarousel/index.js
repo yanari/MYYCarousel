@@ -4,6 +4,11 @@ import React, {Component, createRef} from 'react';
 import PropTypes from 'prop-types';
 import CarouselArrow from './CarouselArrow';
 import CarouselDots from './CarouselDots';
+import {
+  handleDisableBodyScroll,
+  handleEnableBodyScroll,
+  handleScrollOrSwipe,
+} from './utils/helper';
 
 class MYYCarousel extends Component {
   constructor (props) {
@@ -28,16 +33,7 @@ class MYYCarousel extends Component {
   }
 
   setCarouselIndex = (carouselIndex) => {
-    this.setState({
-      animate: true,
-      carouselIndex,
-    }, () => {
-      setTimeout(() => {
-        this.setState({
-          animate: false,
-        });
-      }, 275);
-    });
+    this.handleAnimation({carouselIndex});
   };
 
   handleTouchStart = (e) => {
@@ -55,7 +51,6 @@ class MYYCarousel extends Component {
     if (this.state.isScrolling) return;
     const {items} = this.props;
     const deltaX = e.changedTouches[0].clientX - this.state.initialPositionX;
-    const deltaY = e.changedTouches[0].clientY - this.state.initialPositionY;
     const isNotFirstItem = this.state.carouselIndex < items.length - 1;
     const isNotLastItem = this.state.carouselIndex > 0;
     const threshold = this.state.itemsWidth / 4;
@@ -72,21 +67,11 @@ class MYYCarousel extends Component {
       });
       return;
     }
-    if (Math.abs(deltaY) > 10) {
-      this.setState({
-        isScrolling: true,
-        isSwiping: false,
-      });
-      return;
-    }
-    if (Math.abs(deltaX) > 10) {
-      this.setState({
-        isSwiping: true,
-        isScrolling: false,
-      });
-    }
+    const returnedState = handleScrollOrSwipe(e, this.state);
+    if (!returnedState) return;
+    this.setState(returnedState);
     if (this.state.isSwiping) {
-      this.handleDisableBodyScroll();
+      handleDisableBodyScroll();
       e.persist();
       this.setState((prevState) => {
         return {
@@ -99,15 +84,7 @@ class MYYCarousel extends Component {
   };
 
   handleTouchEnd = (e) => {
-    this.setState({
-      animate: true,
-    }, () => {
-      setTimeout(() => {
-        this.setState({
-          animate: false,
-        });
-      }, 275);
-    });
+    this.handleAnimation();
     const deltaX = e.changedTouches[0].clientX - this.state.initialPositionX;
     const threshold = this.state.itemsWidth / 4; // movimento minimo pra ser considerado um swipe
     const isValidSwipe = Math.abs(deltaX) >= threshold; // tem que ser no minimo metade do container pra mudar de indice
@@ -118,7 +95,7 @@ class MYYCarousel extends Component {
         this.handleIncrementIndex();
       }
     }
-    this.handleEnableBodyScroll();
+    handleEnableBodyScroll();
     this.setState({
       initialPositionX: 0,
       positionX: 0,
@@ -131,47 +108,28 @@ class MYYCarousel extends Component {
     const {items} = this.props;
     const isNotLastItem = this.state.carouselIndex < items.length - 1;
     if (isNotLastItem) {
-      this.setState((prevState) => {
-        return {
-          carouselIndex: prevState.carouselIndex + 1,
-          animate: true,
-        };
-      }, () => {
-        setTimeout(() => {
-          this.setState({
-            animate: false,
-          });
-        }, 275);
-      });
+      this.handleAnimation({carouselIndex: this.state.carouselIndex + 1});
     }
   };
 
   handleDecrementIndex = () => {
     const isNotFirstItem = this.state.carouselIndex > 0;
     if (isNotFirstItem) {
-      this.setState((prevState) => {
-        return {
-          carouselIndex: prevState.carouselIndex - 1,
-          animate: true,
-        };
-      }, () => {
-        setTimeout(() => {
-          this.setState({
-            animate: false,
-          });
-        }, 275);
-      });
+      this.handleAnimation({carouselIndex: this.state.carouselIndex - 1});
     }
   };
 
-  handleDisableBodyScroll = () => {
-    document.body.style.overflow = 'hidden';
-    document.body.style.webkitOverflowScrolling = 'touch'; // Previne a rolagem do body no iOS
-  };
-
-  handleEnableBodyScroll = () => {
-    document.body.style.overflow = 'auto';
-    document.body.style.webkitOverflowScrolling = 'auto';
+  handleAnimation = (newState) => {
+    this.setState({
+      ...newState,
+      animate: true,
+    }, () => {
+      setTimeout(() => {
+        this.setState({
+          animate: false,
+        });
+      }, 275);
+    });
   };
 
   render () {

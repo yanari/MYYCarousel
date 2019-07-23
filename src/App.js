@@ -1,5 +1,4 @@
 import React from 'react';
-import Carousel from './Carousel';
 import MYYCarousel from './MYYCarousel';
 import './App.css';
 
@@ -23,14 +22,14 @@ function App() {
   };
   return (
     <div style = {{marginTop: 48}}>
-      <Carousel
-        itemRenderer = {itemRenderer}
-        items = {lista}
-      />
       <MYYCarousel
         itemRenderer = {itemRenderer}
         items = {lista}
       />
+      <p>Lorem d;asjd;as askldh akls hd</p>
+      <p>Lorem d;asjd;as askldh akls hd</p>
+      <p>Lorem d;asjd;as askldh akls hd</p>
+      <p>Lorem d;asjd;as askldh akls hd</p>
       <p>Lorem d;asjd;as askldh akls hd</p>
       <p>Lorem d;asjd;as askldh akls hd</p>
       <p>Lorem d;asjd;as askldh akls hd</p>
