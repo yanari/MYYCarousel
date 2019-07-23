@@ -4,11 +4,7 @@ import React, {Component, createRef} from 'react';
 import PropTypes from 'prop-types';
 import CarouselArrow from './CarouselArrow';
 import CarouselDots from './CarouselDots';
-import {
-  handleDisableBodyScroll,
-  handleEnableBodyScroll,
-  handleScrollOrSwipe,
-} from './utils/helper';
+import {handleScrollOrSwipe} from './utils/helper';
 
 class MYYCarousel extends Component {
   constructor (props) {
@@ -18,8 +14,8 @@ class MYYCarousel extends Component {
       animate: false, // state pra rodar a animacao
       carouselIndex: props.startIndex,
       initialPositionX: null, // pra calcular o delta (se o swipe é pra direita ou esquerda)
-      isScrolling: false,
-      isSwiping: true,
+      isScrolling: false, // se tiver scrollando nao tem como swipar
+      isSwiping: true, // se tiver swipando n tem como scrollar (so no ios)
       itemsWidth: null, // nao consegui passar pro render pq o ref n ta pronto quando renderiza ainda
       offsetCursor: null, // distancia entre o cursor e a esquerda no touch start pra n ter o problema da borda do item acompanhar o cursor
       positionX: null, // onde o cursor ta no eixo X + a a distancia entre o cursor e a esquerda
@@ -70,7 +66,6 @@ class MYYCarousel extends Component {
     const returnedState = handleScrollOrSwipe(e, this.state);
     this.setState(returnedState);
     if (this.state.isSwiping) {
-      handleDisableBodyScroll();
       e.persist();
       this.setState((prevState) => {
         return {
@@ -94,7 +89,6 @@ class MYYCarousel extends Component {
         this.handleIncrementIndex();
       }
     }
-    handleEnableBodyScroll();
     this.setState({
       initialPositionX: 0,
       positionX: 0,
@@ -118,7 +112,7 @@ class MYYCarousel extends Component {
     }
   };
 
-  handleAnimation = (newState) => {
+  handleAnimation = (newState) => { // adiciona o transition e depois de 275ms retira
     this.setState({
       ...newState,
       animate: true,
@@ -134,7 +128,7 @@ class MYYCarousel extends Component {
   render () {
     const {itemRenderer, items} = this.props;
     const transition = (-(this.state.itemsWidth * this.state.carouselIndex) + this.state.positionX);
-    const wrapperStyle = {
+    const itemsContainerStyle = {
       transform: `translate3d(${transition}px, 0, 0)`, // o que indica a posição
       transition: this.state.animate ? 'transform 275ms ease' : null, // anima so no touch end
       width: this.state.itemsWidth * items.length, // pra acomodar todos os itens horizontalmente um do lado do outro
@@ -149,7 +143,7 @@ class MYYCarousel extends Component {
               onTouchEnd = {this.handleTouchEnd}
               onTouchMove = {this.handleTouchMove}
               onTouchStart = {this.handleTouchStart}
-              style = {wrapperStyle}
+              style = {itemsContainerStyle}
             >
               {items.map((data, index) => {
                 return (

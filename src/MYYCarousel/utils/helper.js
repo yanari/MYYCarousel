@@ -1,12 +1,3 @@
-export const handleDisableBodyScroll = () => {
-  document.body.style.overflow = 'hidden';
-  
-};
-
-export const handleEnableBodyScroll = () => {
-  document.body.style.overflow = 'auto';
-};
-
 export const handleScrollOrSwipe = (e, state) => {
   const {initialPositionX, initialPositionY} = state;
   const deltaX = e.changedTouches[0].clientX - initialPositionX;
