@@ -14,7 +14,7 @@ class MYYCarousel extends Component {
       carouselIndex: props.startIndex,
       initialPositionX: null, // pra calcular o delta (se o swipe é pra direita ou esquerda)
       isScrolling: false,
-      isSwiping: false,
+      isSwiping: true,
       itemsWidth: null, // nao consegui passar pro render pq o ref n ta pronto quando renderiza ainda
       offsetCursor: null, // distancia entre o cursor e a esquerda no touch start pra n ter o problema da borda do item acompanhar o cursor
       positionX: null, // onde o cursor ta no eixo X + a a distancia entre o cursor e a esquerda
@@ -52,8 +52,10 @@ class MYYCarousel extends Component {
   };
 
   handleTouchMove = (e) => {
+    if (this.state.isScrolling) return;
     const {items} = this.props;
     const deltaX = e.changedTouches[0].clientX - this.state.initialPositionX;
+    const deltaY = e.changedTouches[0].clientY - this.state.initialPositionY;
     const isNotFirstItem = this.state.carouselIndex < items.length - 1;
     const isNotLastItem = this.state.carouselIndex > 0;
     const threshold = this.state.itemsWidth / 4;
@@ -70,14 +72,30 @@ class MYYCarousel extends Component {
       });
       return;
     }
-    e.persist();
-    this.setState((prevState) => {
-      return {
-        // acompanha pra onde o cursor ou dedo ta indo, tira qualquer margem ou padding que possa existir e subtrai a
-        // diferença entre onde o cursor/dedo tava na hora do touchstart e a esquerda do container
-        positionX: ((e.touches[0].clientX - this.refContainer.current.offsetLeft) - prevState.offsetCursor),
-      };
-    });
+    console.log(deltaX);
+    if (Math.abs(deltaY) > 10) {
+      this.setState({
+        isScrolling: true,
+        isSwiping: false,
+      });
+      return;
+    }
+    if (Math.abs(deltaX) > 10) {
+      this.setState({
+        isSwiping: true,
+        isScrolling: false,
+      });
+    }
+    if (this.state.isSwiping) {
+      e.persist();
+      this.setState((prevState) => {
+        return {
+          // acompanha pra onde o cursor ou dedo ta indo, tira qualquer margem ou padding que possa existir e subtrai a
+          // diferença entre onde o cursor/dedo tava na hora do touchstart e a esquerda do container
+          positionX: ((e.touches[0].clientX - this.refContainer.current.offsetLeft) - prevState.offsetCursor),
+        };
+      });
+    }
   };
 
   handleTouchEnd = (e) => {
@@ -93,14 +111,18 @@ class MYYCarousel extends Component {
     const deltaX = e.changedTouches[0].clientX - this.state.initialPositionX;
     const threshold = this.state.itemsWidth / 4; // movimento minimo pra ser considerado um swipe
     const isValidSwipe = Math.abs(deltaX) >= threshold; // tem que ser no minimo metade do container pra mudar de indice
-    if (deltaX > 0 && isValidSwipe) { // delta positivo quer dizer que foi swipado pra direita
-      this.handleDecrementIndex();
-    } else if (deltaX < 0 && isValidSwipe) { // delta negativo indica que foi swipado pra esquerda
-      this.handleIncrementIndex();
+    if (this.state.isSwiping) {
+      if (deltaX > 0 && isValidSwipe) { // delta positivo quer dizer que foi swipado pra direita
+        this.handleDecrementIndex();
+      } else if (deltaX < 0 && isValidSwipe) { // delta negativo indica que foi swipado pra esquerda
+        this.handleIncrementIndex();
+      }
     }
     this.setState({
       initialPositionX: 0,
       positionX: 0,
+      isScrolling: false,
+      isSwiping: false,
     }); // reseta os valores
   };
 
@@ -139,6 +161,19 @@ class MYYCarousel extends Component {
         }, 275);
       });
     }
+  };
+
+  handleDisableBodyScroll = () => {
+    const preventDefault = e => {
+      e = e || window.event;
+      if (e.preventDefault) e.preventDefault();
+      e.returnValue = false;
+    };
+    window.ontouchmove = preventDefault;
+  };
+
+  handleEnableBodyScroll = () => {
+    window.ontouchmove = null;
   };
 
   render () {
