@@ -8,6 +8,10 @@
 
 .myy-carousel > .myy-carousel__flex-container {
   display: flex;
+  touch-action: pan-y;
+  -ms-touch-action: pan-y;
+  -webkit-touch-callout: none;
+  user-select: none;
   width: 100%;
 }
 
