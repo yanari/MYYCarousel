@@ -10,6 +10,7 @@ class MYYCarousel extends Component {
     super(props);
     this.refContainer = createRef();
     this.state = {
+      animate: false, // state pra rodar a animacao
       carouselIndex: props.startIndex,
       initialPositionX: null, // pra calcular o delta (se o swipe é pra direita ou esquerda)
       isScrolling: false,
@@ -17,7 +18,6 @@ class MYYCarousel extends Component {
       itemsWidth: null, // nao consegui passar pro render pq o ref n ta pronto quando renderiza ainda
       offsetCursor: null, // distancia entre o cursor e a esquerda no touch start pra n ter o problema da borda do item acompanhar o cursor
       positionX: null, // onde o cursor ta no eixo X + a a distancia entre o cursor e a esquerda
-      animate: false, // state pra rodar a animacao
     };
   }
 
@@ -44,6 +44,8 @@ class MYYCarousel extends Component {
     this.setState({
       // so ta aqui pra calcular o delta
       initialPositionX: e.touches[0].clientX,
+      // pra saber se ta scrollando ou swipando
+      initialPositionY: e.touches[0].clientY,
       // diferença entre o ponto que o cursor esta na hora do click e a esquerda do container (levando em conta margins e paddings)
       offsetCursor: e.touches[0].clientX - this.refContainer.current.offsetLeft,
     });
@@ -52,17 +54,17 @@ class MYYCarousel extends Component {
   handleTouchMove = (e) => {
     const {items} = this.props;
     const deltaX = e.changedTouches[0].clientX - this.state.initialPositionX;
-    const canBeSwipedLeft = this.state.carouselIndex < items.length - 1; // náo é o primeiro item
-    const canBeSwipedRight = this.state.carouselIndex > 0; // nao é o ultimo item
+    const isNotFirstItem = this.state.carouselIndex < items.length - 1;
+    const isNotLastItem = this.state.carouselIndex > 0;
     const threshold = this.state.itemsWidth / 4;
     // impedir que o usuario swipe pro lado esquerdo qd é o ultimo item e pro lado direito quando é o primeiro item
-    if (!canBeSwipedLeft && deltaX < -threshold) {
+    if (!isNotFirstItem && deltaX < -threshold) {
       this.setState({
         positionX: -threshold,
       });
       return;
     }
-    if (!canBeSwipedRight && deltaX > threshold) {
+    if (!isNotLastItem && deltaX > threshold) {
       this.setState({
         positionX: threshold,
       });
