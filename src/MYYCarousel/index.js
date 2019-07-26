@@ -29,7 +29,7 @@ class MYYCarousel extends Component {
   }
 
   setCarouselIndex = (carouselIndex) => {
-    this.handleAnimation({carouselIndex});
+    this.handleAnimationAndSetState({carouselIndex});
   };
 
   handleTouchStart = (e) => {
@@ -66,6 +66,9 @@ class MYYCarousel extends Component {
     const returnedState = handleScrollOrSwipe(e, this.state);
     this.setState(returnedState);
     if (this.state.isSwiping) {
+      document.body.ontouchmove = (event) => {
+        event.preventDefault();
+      };
       e.persist();
       this.setState((prevState) => {
         return {
@@ -78,7 +81,7 @@ class MYYCarousel extends Component {
   };
 
   handleTouchEnd = (e) => {
-    this.handleAnimation();
+    this.handleAnimationAndSetState();
     const deltaX = e.changedTouches[0].clientX - this.state.initialPositionX;
     const threshold = this.state.itemsWidth / 4; // movimento minimo pra ser considerado um swipe
     const isValidSwipe = Math.abs(deltaX) >= threshold; // tem que ser no minimo metade do container pra mudar de indice
@@ -89,11 +92,14 @@ class MYYCarousel extends Component {
         this.handleIncrementIndex();
       }
     }
+    document.body.ontouchmove = (event) => {
+      return true;
+    };
     this.setState({
       initialPositionX: 0,
-      positionX: 0,
       isScrolling: false,
       isSwiping: false,
+      positionX: 0,
     }); // reseta os valores
   };
 
@@ -101,18 +107,18 @@ class MYYCarousel extends Component {
     const {items} = this.props;
     const isNotLastItem = this.state.carouselIndex < items.length - 1;
     if (isNotLastItem) {
-      this.handleAnimation({carouselIndex: this.state.carouselIndex + 1});
+      this.handleAnimationAndSetState({carouselIndex: this.state.carouselIndex + 1});
     }
   };
 
   handleDecrementIndex = () => {
     const isNotFirstItem = this.state.carouselIndex > 0;
     if (isNotFirstItem) {
-      this.handleAnimation({carouselIndex: this.state.carouselIndex - 1});
+      this.handleAnimationAndSetState({carouselIndex: this.state.carouselIndex - 1});
     }
   };
 
-  handleAnimation = (newState) => { // adiciona o transition e depois de 275ms retira
+  handleAnimationAndSetState = (newState) => { // adiciona o transition e depois de 275ms retira
     this.setState({
       ...newState,
       animate: true,
@@ -128,7 +134,7 @@ class MYYCarousel extends Component {
   render () {
     const {itemRenderer, items} = this.props;
     const transition = (-(this.state.itemsWidth * this.state.carouselIndex) + this.state.positionX);
-    const itemsContainerStyle = {
+    const wrapperStyle = {
       transform: `translate3d(${transition}px, 0, 0)`, // o que indica a posição
       transition: this.state.animate ? 'transform 275ms ease' : null, // anima so no touch end
       width: this.state.itemsWidth * items.length, // pra acomodar todos os itens horizontalmente um do lado do outro
@@ -143,7 +149,7 @@ class MYYCarousel extends Component {
               onTouchEnd = {this.handleTouchEnd}
               onTouchMove = {this.handleTouchMove}
               onTouchStart = {this.handleTouchStart}
-              style = {itemsContainerStyle}
+              style = {wrapperStyle}
             >
               {items.map((data, index) => {
                 return (
