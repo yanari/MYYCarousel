@@ -132,17 +132,26 @@ class MYYCarousel extends Component {
   };
 
   render () {
-    const {itemRenderer, items} = this.props;
-    const transition = (-(this.state.itemsWidth * this.state.carouselIndex) + this.state.positionX);
+    const itemMargin = 8;
+    const {hasArrows, itemRenderer, items} = this.props;
+    const transition = (-((this.state.itemsWidth + (itemMargin * 2)) * this.state.carouselIndex) + this.state.positionX);
     const wrapperStyle = {
       transform: `translate3d(${transition}px, 0, 0)`, // o que indica a posição
       transition: this.state.animate ? 'transform 275ms ease' : null, // anima so no touch end
-      width: this.state.itemsWidth * items.length, // pra acomodar todos os itens horizontalmente um do lado do outro
+      width: (this.state.itemsWidth + (itemMargin * 2)) * items.length, // pra acomodar todos os itens horizontalmente um do lado do outro
+    };
+    const itemStyle = {
+      margin: `0 ${itemMargin}px`,
+      width: this.state.itemsWidth,
     };
     return (
       <div className = "myy-carousel" ref = {this.refContainer}>
         <div className = "myy-carousel__flex-container">
-          <CarouselArrow direction = "left" handleClick = {this.handleDecrementIndex}/>
+          <CarouselArrow
+            direction = "left"
+            handleClick = {this.handleDecrementIndex}
+            hasArrows = {hasArrows}
+          />
           <div className = "myy-carousel__items-container-wrapper" style = {{width: this.state.itemsWidth}}>
             <div
               className = "myy-carousel__items-container"
@@ -156,7 +165,7 @@ class MYYCarousel extends Component {
                   <div
                     className = "myy-carousel__item"
                     key = {index}
-                    style = {{width: this.state.itemsWidth}}
+                    style = {{...itemStyle, marginLeft: index === 0 ? 0 : itemMargin}}
                   >
                     {itemRenderer({data})}
                   </div>
@@ -164,7 +173,11 @@ class MYYCarousel extends Component {
               })}
             </div>
           </div>
-          <CarouselArrow direction = "right" handleClick = {this.handleIncrementIndex}/>
+          <CarouselArrow
+            direction = "right"
+            handleClick = {this.handleIncrementIndex}
+            hasArrows = {hasArrows}
+          />
         </div>
         <CarouselDots
           carouselIndex = {this.state.carouselIndex}
@@ -177,6 +190,7 @@ class MYYCarousel extends Component {
 }
 
 MYYCarousel.propTypes = {
+  hasArrows: PropTypes.bool,
   itemRenderer: PropTypes.func.isRequired,
   items: PropTypes.instanceOf(Object).isRequired,
   startIndex: PropTypes.number,
