@@ -132,10 +132,14 @@ class MYYCarousel extends Component {
   };
 
   render () {
-    const itemMargin = 8;
-    const {hasArrows, itemRenderer, items} = this.props;
+    const {hasArrows, itemRenderer, items, itemsOccupyFullWidth} = this.props;
+    const itemMargin = itemsOccupyFullWidth ? 0 : 8;
     const transition = (-((this.state.itemsWidth + (itemMargin * 2)) * this.state.carouselIndex) + this.state.positionX);
-    const wrapperStyle = {
+    const itemsContainerWrapperStyle = {
+      overflow: itemsOccupyFullWidth ? 'hidden' : '',
+      width: this.state.itemsWidth,
+    };
+    const itemsContainerStyle = {
       transform: `translate3d(${transition}px, 0, 0)`, // o que indica a posição
       transition: this.state.animate ? 'transform 275ms ease' : null, // anima so no touch end
       width: (this.state.itemsWidth + (itemMargin * 2)) * items.length, // pra acomodar todos os itens horizontalmente um do lado do outro
@@ -152,13 +156,13 @@ class MYYCarousel extends Component {
             handleClick = {this.handleDecrementIndex}
             hasArrows = {hasArrows}
           />
-          <div className = "myy-carousel__items-container-wrapper" style = {{width: this.state.itemsWidth}}>
+          <div className = "myy-carousel__items-container-wrapper" style = {itemsContainerWrapperStyle}>
             <div
               className = "myy-carousel__items-container"
               onTouchEnd = {this.handleTouchEnd}
               onTouchMove = {this.handleTouchMove}
               onTouchStart = {this.handleTouchStart}
-              style = {wrapperStyle}
+              style = {itemsContainerStyle}
             >
               {items.map((data, index) => {
                 return (
@@ -193,6 +197,7 @@ MYYCarousel.propTypes = {
   hasArrows: PropTypes.bool,
   itemRenderer: PropTypes.func.isRequired,
   items: PropTypes.instanceOf(Object).isRequired,
+  itemsOccupyFullWidth: PropTypes.bool,
   startIndex: PropTypes.number,
 };
 

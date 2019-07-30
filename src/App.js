@@ -25,6 +25,7 @@ function App() {
       <MYYCarousel
         itemRenderer = {itemRenderer}
         items = {lista}
+        itemsOccupyFullWidth = {false}
       />
       <p>Lorem d;asjd;as askldh akls hd</p>
       <p>Lorem d;asjd;as askldh akls hd</p>
