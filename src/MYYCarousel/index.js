@@ -57,7 +57,7 @@ class MYYCarousel extends Component {
     const returnedState = handleScrollOrSwipe(e, this.state);
     this.setState(returnedState);
     if (this.state.isScrolling) return;
-    e.preventDefault();
+    else if (this.state.isSwiping) e.preventDefault();
     const {items} = this.props;
     const deltaX = e.changedTouches[0].clientX - this.state.initialPositionX;
     const isNotFirstItem = this.state.carouselIndex < items.length - 1;
@@ -99,9 +99,6 @@ class MYYCarousel extends Component {
         this.handleIncrementIndex();
       }
     }
-    document.body.ontouchmove = (event) => {
-      return true;
-    };
     this.setState({
       initialPositionX: 0,
       isScrolling: false,
