@@ -10,12 +10,13 @@ class MYYCarousel extends Component {
   constructor (props) {
     super(props);
     this.refContainer = createRef();
+    this.refItemsContainer = createRef();
     this.state = {
       animate: false, // state pra rodar a animacao
       carouselIndex: props.startIndex,
       initialPositionX: null, // pra calcular o delta (se o swipe é pra direita ou esquerda)
       isScrolling: false, // se tiver scrollando nao tem como swipar
-      isSwiping: true, // se tiver swipando n tem como scrollar (so no ios)
+      isSwiping: false, // se tiver swipando n tem como scrollar (so no ios)
       itemsWidth: null, // nao consegui passar pro render pq o ref n ta pronto quando renderiza ainda
       offsetCursor: null, // distancia entre o cursor e a esquerda no touch start pra n ter o problema da borda do item acompanhar o cursor
       positionX: null, // onde o cursor ta no eixo X + a a distancia entre o cursor e a esquerda
@@ -23,9 +24,18 @@ class MYYCarousel extends Component {
   }
 
   componentDidMount () {
+    this.refItemsContainer.current.addEventListener('touchstart', this.handleTouchStart);
+    this.refItemsContainer.current.addEventListener('touchmove', this.handleTouchMove, {passive: false});
+    this.refItemsContainer.current.addEventListener('touchend', this.handleTouchEnd, {passive: false});
     this.setState({
       itemsWidth: this.refContainer.current.getBoundingClientRect().width - 64, // tamanho das duas setas
     });
+  }
+
+  componentWillUnmount () {
+    this.refItemsContainer.current.removeEventListener('touchstart', this.handleTouchStart);
+    this.refItemsContainer.current.removeEventListener('touchmove', this.handleTouchMove, {passive: false});
+    this.refItemsContainer.current.removeEventListener('touchend', this.handleTouchEnd, {passive: false});
   }
 
   setCarouselIndex = (carouselIndex) => {
@@ -44,7 +54,10 @@ class MYYCarousel extends Component {
   };
 
   handleTouchMove = (e) => {
+    const returnedState = handleScrollOrSwipe(e, this.state);
+    this.setState(returnedState);
     if (this.state.isScrolling) return;
+    e.preventDefault();
     const {items} = this.props;
     const deltaX = e.changedTouches[0].clientX - this.state.initialPositionX;
     const isNotFirstItem = this.state.carouselIndex < items.length - 1;
@@ -63,13 +76,7 @@ class MYYCarousel extends Component {
       });
       return;
     }
-    const returnedState = handleScrollOrSwipe(e, this.state);
-    this.setState(returnedState);
     if (this.state.isSwiping) {
-      document.body.ontouchmove = (event) => {
-        event.preventDefault();
-      };
-      e.persist();
       this.setState((prevState) => {
         return {
           // acompanha pra onde o cursor ou dedo ta indo, tira qualquer margem ou padding que possa existir e subtrai a
@@ -159,9 +166,7 @@ class MYYCarousel extends Component {
           <div className = "myy-carousel__items-container-wrapper" style = {itemsContainerWrapperStyle}>
             <div
               className = "myy-carousel__items-container"
-              onTouchEnd = {this.handleTouchEnd}
-              onTouchMove = {this.handleTouchMove}
-              onTouchStart = {this.handleTouchStart}
+              ref = {this.refItemsContainer}
               style = {itemsContainerStyle}
             >
               {items.map((data, index) => {
