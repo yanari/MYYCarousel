@@ -2,6 +2,7 @@
   align-items: center;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
   position: relative;
   width: 100%;
 }
