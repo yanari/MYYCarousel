@@ -23,6 +23,7 @@ function App() {
   return (
     <div style = {{marginTop: 48}}>
       <MYYCarousel
+        arrowSize = {64}
         itemRenderer = {itemRenderer}
         items = {lista}
         itemsOccupyFullWidth = {false}

@@ -24,11 +24,12 @@ class MYYCarousel extends Component {
   }
 
   componentDidMount () {
+    const {arrowSize} = this.props;
     this.refItemsContainer.current.addEventListener('touchstart', this.handleTouchStart);
     this.refItemsContainer.current.addEventListener('touchmove', this.handleTouchMove, {passive: false});
     this.refItemsContainer.current.addEventListener('touchend', this.handleTouchEnd, {passive: false});
     this.setState({
-      itemsWidth: this.refContainer.current.getBoundingClientRect().width - 64, // tamanho das duas setas
+      itemsWidth: this.refContainer.current.getBoundingClientRect().width - (arrowSize * 2), // tamanho das duas setas
     });
   }
 
@@ -136,7 +137,13 @@ class MYYCarousel extends Component {
   };
 
   render () {
-    const {hasArrows, itemRenderer, items, itemsOccupyFullWidth} = this.props;
+    const {
+      arrowSize,
+      hasArrows,
+      itemRenderer,
+      items,
+      itemsOccupyFullWidth,
+    } = this.props;
     const itemMargin = itemsOccupyFullWidth ? 0 : 8;
     const transition = (-((this.state.itemsWidth + (itemMargin * 2)) * this.state.carouselIndex) + this.state.positionX);
     const itemsContainerWrapperStyle = {
@@ -159,6 +166,7 @@ class MYYCarousel extends Component {
             direction = "left"
             handleClick = {this.handleDecrementIndex}
             hasArrows = {hasArrows}
+            size = {arrowSize}
           />
           <div className = "myy-carousel__items-container-wrapper" style = {itemsContainerWrapperStyle}>
             <div
@@ -183,6 +191,7 @@ class MYYCarousel extends Component {
             direction = "right"
             handleClick = {this.handleIncrementIndex}
             hasArrows = {hasArrows}
+            size = {arrowSize}
           />
         </div>
         <CarouselDots
@@ -196,6 +205,7 @@ class MYYCarousel extends Component {
 }
 
 MYYCarousel.propTypes = {
+  arrowSize: PropTypes.number,
   hasArrows: PropTypes.bool,
   itemRenderer: PropTypes.func.isRequired,
   items: PropTypes.instanceOf(Object).isRequired,
@@ -204,6 +214,7 @@ MYYCarousel.propTypes = {
 };
 
 MYYCarousel.defaultProps = {
+  arrowSize: 32,
   startIndex: 0,
 };
 

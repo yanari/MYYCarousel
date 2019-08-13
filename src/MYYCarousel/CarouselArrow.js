@@ -1,13 +1,21 @@
+import './CarouselArrow.css';
+
 import React from 'react';
 import PropTypes from 'prop-types';
 import SvgIcon from './SvgIcon';
 
-function CarouselArrow ({direction, handleClick, hasArrows}) {
+function CarouselArrow (props) {
+  const {
+    direction,
+    handleClick,
+    hasArrows,
+    size,
+  } = props;
   return (
     <button
-      className = {'myy-carousel__arrow-button myy-carousel__arrow-button--' + direction}
+      className = "myy-carousel__arrow-button"
       onClick = {handleClick}
-      style = {{opacity: hasArrows ? 1 : 0}}
+      style = {{opacity: hasArrows ? 1 : 0, '--arrow-size': size + 'px'}}
       type = "button"
     >
       <SvgIcon name = {'feather-chevron-' + direction}/>
