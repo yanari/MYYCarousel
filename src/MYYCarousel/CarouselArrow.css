@@ -1,8 +1,0 @@
-.myy-carousel__arrow-button {
-  z-index: 1;
-}
-
-.myy-carousel__arrow-button > .svg-icon > svg {
-  height: var(--arrow-size);
-  width: var(--arrow-size);
-}

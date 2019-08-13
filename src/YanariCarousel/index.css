@@ -1,0 +1,37 @@
+.yanari-carousel {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.yanari-carousel > .yanari-carousel__flex-container {
+  display: flex;
+  justify-content: center;
+  touch-action: pan-y;
+  user-select: none;
+  width: 100%;
+}
+
+.yanari-carousel > .yanari-carousel__flex-container > .yanari-carousel__items-wrapper {
+  display: flex;
+  overflow: hidden;
+}
+
+.yanari-carousel > .yanari-carousel__flex-container .yanari-carousel__item {
+  float: left;
+}
+
+.yanari-carousel > .yanari-carousel__flex-container .yanari-carousel__item:first-child {
+  margin-left: 0 !important;
+}
+
+.yanari-carousel > .yanari-carousel__flex-container .yanari-carousel__item:last-child {
+  margin-right: 0 !important;
+}
+
+.yanari-carousel__preview-button {
+  z-index: 1;
+}

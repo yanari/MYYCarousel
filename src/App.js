@@ -1,5 +1,5 @@
 import React from 'react';
-import MYYCarousel from './MYYCarousel';
+import YanariCarousel from './YanariCarousel';
 import './App.css';
 
 function App() {
@@ -22,11 +22,11 @@ function App() {
   };
   return (
     <div style = {{marginTop: 48}}>
-      <MYYCarousel
-        arrowSize = {64}
+      <YanariCarousel
+        hasArrows = {true}
         itemRenderer = {itemRenderer}
         items = {lista}
-        itemsOccupyFullWidth = {false}
+        itemPreviewSize = {64}
       />
       <p>Lorem d;asjd;as askldh akls hd</p>
       <p>Lorem d;asjd;as askldh akls hd</p>

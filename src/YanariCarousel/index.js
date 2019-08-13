@@ -3,10 +3,11 @@ import './index.css';
 import React, {Component, createRef} from 'react';
 import PropTypes from 'prop-types';
 import CarouselArrow from './CarouselArrow';
+import CarouselController from './CarouselController';
 import CarouselDots from './CarouselDots';
-import {handleScrollOrSwipe} from './utils/helper';
+import {handleScrollOrSwipe} from './utils/handleScrollOrSwipe';
 
-class MYYCarousel extends Component {
+class YanariCarousel extends Component {
   constructor (props) {
     super(props);
     this.refContainer = createRef();
@@ -19,17 +20,19 @@ class MYYCarousel extends Component {
       isSwiping: false, // se tiver swipando n tem como scrollar (so no ios)
       itemsWidth: null, // nao consegui passar pro render pq o ref n ta pronto quando renderiza ainda
       offsetCursor: null, // distancia entre o cursor e a esquerda no touch start pra n ter o problema da borda do item acompanhar o cursor
-      positionX: null, // onde o cursor ta no eixo X + a a distancia entre o cursor e a esquerda
+      positionX: null, // onde o cursor ta no eixo X + a distancia entre o cursor e a esquerda
     };
   }
 
   componentDidMount () {
-    const {arrowSize} = this.props;
+    const {arrowSize, hasArrows, itemPreviewSize, showPrevAndNext} = this.props;
+    const arrowMargins = hasArrows ? (arrowSize * 2) : 0;
+    const itemPreviewMargins = showPrevAndNext ? (itemPreviewSize * 2) : null;
     this.refItemsContainer.current.addEventListener('touchstart', this.handleTouchStart);
     this.refItemsContainer.current.addEventListener('touchmove', this.handleTouchMove, {passive: false});
     this.refItemsContainer.current.addEventListener('touchend', this.handleTouchEnd, {passive: false});
     this.setState({
-      itemsWidth: this.refContainer.current.getBoundingClientRect().width - (arrowSize * 2), // tamanho das duas setas
+      itemsWidth: this.refContainer.current.getBoundingClientRect().width - (arrowMargins + itemPreviewMargins),
     });
   }
 
@@ -140,82 +143,95 @@ class MYYCarousel extends Component {
     const {
       arrowSize,
       hasArrows,
+      hasDots,
       itemRenderer,
       items,
-      itemsOccupyFullWidth,
+      itemPreviewSize,
+      showPrevAndNext,
     } = this.props;
-    const itemMargin = itemsOccupyFullWidth ? 0 : 8;
+    const itemMargin = 8;
     const transition = (-((this.state.itemsWidth + (itemMargin * 2)) * this.state.carouselIndex) + this.state.positionX);
-    const itemsContainerWrapperStyle = {
-      overflow: itemsOccupyFullWidth ? 'hidden' : '',
-      width: this.state.itemsWidth,
-    };
     const itemsContainerStyle = {
       transform: `translate3d(${transition}px, 0, 0)`, // o que indica a posição
       transition: this.state.animate ? 'transform 275ms ease' : null, // anima so no touch end
       width: (this.state.itemsWidth + (itemMargin * 2)) * items.length, // pra acomodar todos os itens horizontalmente um do lado do outro
     };
     const itemStyle = {
-      margin: `0 ${itemMargin}px`,
+      margin: '0 ' + itemMargin + 'px',
       width: this.state.itemsWidth,
     };
     return (
-      <div className = "myy-carousel" ref = {this.refContainer}>
-        <div className = "myy-carousel__flex-container">
-          <CarouselArrow
-            direction = "left"
-            handleClick = {this.handleDecrementIndex}
-            hasArrows = {hasArrows}
-            size = {arrowSize}
-          />
-          <div className = "myy-carousel__items-container-wrapper" style = {itemsContainerWrapperStyle}>
-            <div
-              className = "myy-carousel__items-container"
-              ref = {this.refItemsContainer}
-              style = {itemsContainerStyle}
-            >
-              {items.map((data, index) => {
-                return (
-                  <div
-                    className = "myy-carousel__item"
-                    key = {index}
-                    style = {{...itemStyle, marginLeft: index === 0 ? 0 : itemMargin}}
-                  >
-                    {itemRenderer({data})}
-                  </div>
-                );
-              })}
+      <div className = "yanari-carousel" ref = {this.refContainer}>
+        <div className = "yanari-carousel__flex-container">
+          {hasArrows ? (
+            <CarouselArrow
+              direction = "left"
+              handleClick = {this.handleDecrementIndex}
+              size = {arrowSize}
+            />
+          ) : null}
+          <div className = "yanari-carousel__items-wrapper">
+            {showPrevAndNext ? (
+              <CarouselController className = "yanari-carousel__preview-button" handleClick = {this.handleDecrementIndex}>
+                <div style = {{height: itemPreviewSize, width: itemPreviewSize}}/>
+              </CarouselController>
+            ) : null}
+            <div className = "yanari-carousel__items-container-wrapper" style = {{width: this.state.itemsWidth}}>
+              <div className = "yanari-carousel__items-container" ref = {this.refItemsContainer} style = {itemsContainerStyle}>
+                {items.map((data, index) => {
+                  return (
+                    <div
+                      className = "yanari-carousel__item"
+                      key = {index}
+                      style = {itemStyle}
+                    >
+                      {itemRenderer({data})}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
+            {showPrevAndNext ? (
+              <CarouselController className = "yanari-carousel__preview-button" handleClick = {this.handleIncrementIndex}>
+                <div style = {{height: itemPreviewSize, width: itemPreviewSize}}/>
+              </CarouselController>
+            ) : null}
           </div>
-          <CarouselArrow
-            direction = "right"
-            handleClick = {this.handleIncrementIndex}
-            hasArrows = {hasArrows}
-            size = {arrowSize}
-          />
+          {hasArrows ? (
+            <CarouselArrow
+              direction = "right"
+              handleClick = {this.handleIncrementIndex}
+              size = {arrowSize}
+            />
+          ) : null}
         </div>
-        <CarouselDots
-          carouselIndex = {this.state.carouselIndex}
-          items = {items}
-          setCarouselIndex = {this.setCarouselIndex}
-        />
+        {hasDots ? (
+          <CarouselDots
+            carouselIndex = {this.state.carouselIndex}
+            items = {items}
+            setCarouselIndex = {this.setCarouselIndex}
+          />
+        ) : null}
       </div>
     );
   }
 }
 
-MYYCarousel.propTypes = {
+YanariCarousel.propTypes = {
   arrowSize: PropTypes.number,
   hasArrows: PropTypes.bool,
+  hasDots: PropTypes.bool,
   itemRenderer: PropTypes.func.isRequired,
   items: PropTypes.instanceOf(Object).isRequired,
-  itemsOccupyFullWidth: PropTypes.bool,
+  showPrevAndNext: PropTypes.bool,
   startIndex: PropTypes.number,
 };
 
-MYYCarousel.defaultProps = {
+YanariCarousel.defaultProps = {
   arrowSize: 32,
+  itemPreviewSize: 32,
   startIndex: 0,
+  showPrevAndNext: true,
 };
 
-export default MYYCarousel;
+export default YanariCarousel;
