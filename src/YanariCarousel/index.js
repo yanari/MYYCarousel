@@ -3,7 +3,6 @@ import './index.css';
 import React, {Component, createRef} from 'react';
 import PropTypes from 'prop-types';
 import CarouselArrow from './CarouselArrow';
-import CarouselController from './CarouselController';
 import CarouselDots from './CarouselDots';
 import {handleScrollOrSwipe} from './utils/handleScrollOrSwipe';
 
@@ -172,12 +171,16 @@ class YanariCarousel extends Component {
           ) : null}
           <div className = "yanari-carousel__items-wrapper">
             {showPrevAndNext ? (
-              <CarouselController className = "yanari-carousel__preview-button" handleClick = {this.handleDecrementIndex}>
+              <button
+                className = "yanari-carousel__preview-button"
+                onClick = {this.handleDecrementIndex}
+                type = "button"
+              >
                 <div style = {{height: itemPreviewSize, width: itemPreviewSize}}/>
-              </CarouselController>
+              </button>
             ) : null}
-            <div className = "yanari-carousel__items-container-wrapper" style = {{width: this.state.itemsWidth}}>
-              <div className = "yanari-carousel__items-container" ref = {this.refItemsContainer} style = {itemsContainerStyle}>
+            <div className = "yanari-carousel__item-container-wrapper" style = {{width: this.state.itemsWidth}}>
+              <div className = "yanari-carousel__item-container" ref = {this.refItemsContainer} style = {itemsContainerStyle}>
                 {items.map((data, index) => {
                   return (
                     <div
@@ -192,9 +195,13 @@ class YanariCarousel extends Component {
               </div>
             </div>
             {showPrevAndNext ? (
-              <CarouselController className = "yanari-carousel__preview-button" handleClick = {this.handleIncrementIndex}>
+              <button
+                className = "yanari-carousel__preview-button"
+                onClick = {this.handleIncrementIndex}
+                type = "button"
+              >
                 <div style = {{height: itemPreviewSize, width: itemPreviewSize}}/>
-              </CarouselController>
+              </button>
             ) : null}
           </div>
           {hasArrows ? (
@@ -221,6 +228,7 @@ YanariCarousel.propTypes = {
   arrowSize: PropTypes.number,
   hasArrows: PropTypes.bool,
   hasDots: PropTypes.bool,
+  itemPreviewSize: PropTypes.number,
   itemRenderer: PropTypes.func.isRequired,
   items: PropTypes.instanceOf(Object).isRequired,
   showPrevAndNext: PropTypes.bool,
