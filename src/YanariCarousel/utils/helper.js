@@ -1,7 +1,7 @@
 export const handleScrollOrSwipe = (e, state) => {
   const {initialPositionX, initialPositionY} = state;
-  const deltaX = e.changedTouches[0].clientX - initialPositionX;
-  const deltaY = e.changedTouches[0].clientY - initialPositionY;
+  const deltaX = unify(e).clientX - initialPositionX;
+  const deltaY = unify(e).clientY - initialPositionY;
   if (!state.isScrolling) {
     if (Math.abs(deltaX) > 10) {
       return {
@@ -18,4 +18,8 @@ export const handleScrollOrSwipe = (e, state) => {
       };
     }
   }
+};
+
+export const unify = (e) => {
+  return e.changedTouches ? e.changedTouches[0] : e;
 };

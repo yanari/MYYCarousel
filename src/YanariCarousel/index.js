@@ -4,7 +4,7 @@ import React, {Component, createRef} from 'react';
 import PropTypes from 'prop-types';
 import CarouselArrow from './CarouselArrow';
 import CarouselDots from './CarouselDots';
-import {handleScrollOrSwipe} from './utils/handleScrollOrSwipe';
+import {handleScrollOrSwipe, unify} from './utils/helper';
 
 class YanariCarousel extends Component {
   constructor (props) {
@@ -20,16 +20,25 @@ class YanariCarousel extends Component {
       itemsWidth: null, // nao consegui passar pro render pq o ref n ta pronto quando renderiza ainda
       offsetCursor: null, // distancia entre o cursor e a esquerda no touch start pra n ter o problema da borda do item acompanhar o cursor
       positionX: null, // onde o cursor ta no eixo X + a distancia entre o cursor e a esquerda
+      started: false, // pra não sair andando sozinho no mousemove
     };
   }
 
   componentDidMount () {
-    const {arrowSize, hasArrows, itemPreviewSize, showPrevAndNext} = this.props;
+    const {
+      arrowSize,
+      hasArrows,
+      itemPreviewSize,
+      showPrevAndNext,
+    } = this.props;
     const arrowMargins = hasArrows ? (arrowSize * 2) : 0;
     const itemPreviewMargins = showPrevAndNext ? (itemPreviewSize * 2) : null;
     this.refItemsContainer.current.addEventListener('touchstart', this.handleTouchStart);
+    this.refItemsContainer.current.addEventListener('mousedown', this.handleTouchStart);
     this.refItemsContainer.current.addEventListener('touchmove', this.handleTouchMove, {passive: false});
+    document.addEventListener('mousemove', this.handleTouchMove, {passive: false});
     this.refItemsContainer.current.addEventListener('touchend', this.handleTouchEnd, {passive: false});
+    document.addEventListener('mouseup', this.handleTouchEnd);
     this.setState({
       itemsWidth: this.refContainer.current.getBoundingClientRect().width - (arrowMargins + itemPreviewMargins),
     });
@@ -37,8 +46,11 @@ class YanariCarousel extends Component {
 
   componentWillUnmount () {
     this.refItemsContainer.current.removeEventListener('touchstart', this.handleTouchStart);
+    this.refItemsContainer.current.removeEventListener('mousedown', this.handleTouchStart);
     this.refItemsContainer.current.removeEventListener('touchmove', this.handleTouchMove, {passive: false});
+    document.removeEventListener('mousemove', this.handleTouchMove, {passive: false});
     this.refItemsContainer.current.removeEventListener('touchend', this.handleTouchEnd, {passive: false});
+    document.removeEventListener('mouseup', this.handleTouchEnd);
   }
 
   setCarouselIndex = (carouselIndex) => {
@@ -48,66 +60,72 @@ class YanariCarousel extends Component {
   handleTouchStart = (e) => {
     this.setState({
       // so ta aqui pra calcular o delta
-      initialPositionX: e.touches[0].clientX,
+      initialPositionX: unify(e).clientX,
       // pra saber se ta scrollando ou swipando
-      initialPositionY: e.touches[0].clientY,
+      initialPositionY: unify(e).clientY,
       // diferença entre o ponto que o cursor esta na hora do click e a esquerda do container (levando em conta margins e paddings)
-      offsetCursor: e.touches[0].clientX - this.refContainer.current.offsetLeft,
+      offsetCursor: unify(e).clientX - this.refContainer.current.offsetLeft,
+      started: true,
     });
   };
 
   handleTouchMove = (e) => {
-    const returnedState = handleScrollOrSwipe(e, this.state);
-    this.setState(returnedState);
-    if (this.state.isScrolling) return;
-    else if (this.state.isSwiping) e.preventDefault();
-    const {items} = this.props;
-    const deltaX = e.changedTouches[0].clientX - this.state.initialPositionX;
-    const isNotFirstItem = this.state.carouselIndex < items.length - 1;
-    const isNotLastItem = this.state.carouselIndex > 0;
-    const threshold = this.state.itemsWidth / 4;
-    // impedir que o usuario swipe pro lado esquerdo qd é o ultimo item e pro lado direito quando é o primeiro item
-    if (!isNotFirstItem && deltaX < -threshold) {
-      this.setState({
-        positionX: -threshold,
-      });
-      return;
-    }
-    if (!isNotLastItem && deltaX > threshold) {
-      this.setState({
-        positionX: threshold,
-      });
-      return;
-    }
-    if (this.state.isSwiping) {
-      this.setState((prevState) => {
-        return {
-          // acompanha pra onde o cursor ou dedo ta indo, tira qualquer margem ou padding que possa existir e subtrai a
-          // diferença entre onde o cursor/dedo tava na hora do touchstart e a esquerda do container
-          positionX: ((e.touches[0].clientX - this.refContainer.current.offsetLeft) - prevState.offsetCursor),
-        };
-      });
+    if (this.state.started) {
+      const returnedState = handleScrollOrSwipe(e, this.state);
+      this.setState(returnedState);
+      if (this.state.isScrolling) return;
+      else if (this.state.isSwiping) e.preventDefault();
+      const {items} = this.props;
+      const deltaX = unify(e).clientX - this.state.initialPositionX;
+      const isNotFirstItem = this.state.carouselIndex < items.length - 1;
+      const isNotLastItem = this.state.carouselIndex > 0;
+      const threshold = this.state.itemsWidth / 4;
+      // impedir que o usuario swipe pro lado esquerdo qd é o ultimo item e pro lado direito quando é o primeiro item
+      if (!isNotFirstItem && deltaX < -threshold) {
+        this.setState({
+          positionX: -threshold,
+        });
+        return;
+      }
+      if (!isNotLastItem && deltaX > threshold) {
+        this.setState({
+          positionX: threshold,
+        });
+        return;
+      }
+      if (this.state.isSwiping) {
+        this.setState((prevState) => {
+          return {
+            // acompanha pra onde o cursor ou dedo ta indo, tira qualquer margem ou padding que possa existir e subtrai a
+            // diferença entre onde o cursor/dedo tava na hora do touchstart e a esquerda do container
+            positionX: ((unify(e).clientX - this.refContainer.current.offsetLeft) - prevState.offsetCursor),
+          };
+        });
+      }
     }
   };
 
   handleTouchEnd = (e) => {
-    this.handleAnimationAndSetState();
-    const deltaX = e.changedTouches[0].clientX - this.state.initialPositionX;
-    const threshold = this.state.itemsWidth / 4; // movimento minimo pra ser considerado um swipe
-    const isValidSwipe = Math.abs(deltaX) >= threshold; // tem que ser no minimo metade do container pra mudar de indice
-    if (this.state.isSwiping) {
-      if (deltaX > 0 && isValidSwipe) { // delta positivo quer dizer que foi swipado pra direita
-        this.handleDecrementIndex();
-      } else if (deltaX < 0 && isValidSwipe) { // delta negativo indica que foi swipado pra esquerda
-        this.handleIncrementIndex();
+    if (this.state.started) {
+      this.handleAnimationAndSetState();
+      const deltaX = unify(e).clientX - this.state.initialPositionX;
+      const threshold = this.state.itemsWidth / 4; // movimento minimo pra ser considerado um swipe
+      const isValidSwipe = Math.abs(deltaX) >= threshold; // tem que ser no minimo metade do container pra mudar de indice
+      if (this.state.isSwiping) {
+        if (deltaX > 0 && isValidSwipe) { // delta positivo quer dizer que foi swipado pra direita
+          this.handleDecrementIndex();
+        } else if (deltaX < 0 && isValidSwipe) { // delta negativo indica que foi swipado pra esquerda
+          this.handleIncrementIndex();
+        }
       }
+      this.setState({
+        initialPositionX: 0,
+        isScrolling: false,
+        isSwiping: false,
+        positionX: 0,
+        started: false,
+      }); // reseta os valores
     }
-    this.setState({
-      initialPositionX: 0,
-      isScrolling: false,
-      isSwiping: false,
-      positionX: 0,
-    }); // reseta os valores
   };
 
   handleIncrementIndex = () => {
@@ -149,9 +167,9 @@ class YanariCarousel extends Component {
       showPrevAndNext,
     } = this.props;
     const itemMargin = 8;
-    const transition = (-((this.state.itemsWidth + (itemMargin * 2)) * this.state.carouselIndex) + this.state.positionX);
+    const transition = -((this.state.itemsWidth + (itemMargin * 2)) * this.state.carouselIndex) + this.state.positionX;
     const itemsContainerStyle = {
-      transform: `translate3d(${transition}px, 0, 0)`, // o que indica a posição
+      transform: 'translate3d(' + transition + 'px, 0, 0)', // o que indica a posição
       transition: this.state.animate ? 'transform 275ms ease' : null, // anima so no touch end
       width: (this.state.itemsWidth + (itemMargin * 2)) * items.length, // pra acomodar todos os itens horizontalmente um do lado do outro
     };
