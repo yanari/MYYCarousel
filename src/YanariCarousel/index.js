@@ -33,31 +33,32 @@ class YanariCarousel extends Component {
     } = this.props;
     const arrowMargins = hasArrows ? (arrowSize * 2) : 0;
     const itemPreviewMargins = showPrevAndNext ? (itemPreviewSize * 2) : null;
-    this.refItemsContainer.current.addEventListener('touchstart', this.handleTouchStart);
-    this.refItemsContainer.current.addEventListener('mousedown', this.handleTouchStart);
-    this.refItemsContainer.current.addEventListener('touchmove', this.handleTouchMove, {passive: false});
-    document.addEventListener('mousemove', this.handleTouchMove, {passive: false});
-    this.refItemsContainer.current.addEventListener('touchend', this.handleTouchEnd, {passive: false});
-    document.addEventListener('mouseup', this.handleTouchEnd);
+    this.refItemsContainer.current.addEventListener('touchstart', this.handleSwipeStart);
+    this.refItemsContainer.current.addEventListener('mousedown', this.handleSwipeStart);
+    this.refItemsContainer.current.addEventListener('touchmove', this.handleSwipeMove, {passive: false});
+    document.addEventListener('mousemove', this.handleSwipeMove, {passive: false});
+    this.refItemsContainer.current.addEventListener('touchend', this.handleSwipeEnd, {passive: false});
+    document.addEventListener('mouseup', this.handleSwipeEnd);
     this.setState({
       itemsWidth: this.refContainer.current.getBoundingClientRect().width - (arrowMargins + itemPreviewMargins),
     });
   }
 
   componentWillUnmount () {
-    this.refItemsContainer.current.removeEventListener('touchstart', this.handleTouchStart);
-    this.refItemsContainer.current.removeEventListener('mousedown', this.handleTouchStart);
-    this.refItemsContainer.current.removeEventListener('touchmove', this.handleTouchMove, {passive: false});
-    document.removeEventListener('mousemove', this.handleTouchMove, {passive: false});
-    this.refItemsContainer.current.removeEventListener('touchend', this.handleTouchEnd, {passive: false});
-    document.removeEventListener('mouseup', this.handleTouchEnd);
+    this.refItemsContainer.current.removeEventListener('touchstart', this.handleSwipeStart);
+    this.refItemsContainer.current.removeEventListener('mousedown', this.handleSwipeStart);
+    this.refItemsContainer.current.removeEventListener('touchmove', this.handleSwipeMove, {passive: false});
+    document.removeEventListener('mousemove', this.handleSwipeMove, {passive: false});
+    this.refItemsContainer.current.removeEventListener('touchend', this.handleSwipeEnd, {passive: false});
+    document.removeEventListener('mouseup', this.handleSwipeEnd);
   }
 
   setCarouselIndex = (carouselIndex) => {
     this.handleAnimationAndSetState({carouselIndex});
   };
 
-  handleTouchStart = (e) => {
+  handleSwipeStart = (e) => {
+    e.preventDefault ? e.preventDefault() : e.returnValue = false; // pra nao rolar o drag and drop de links dentro do carousel
     this.setState({
       // so ta aqui pra calcular o delta
       initialPositionX: unify(e).clientX,
@@ -69,7 +70,11 @@ class YanariCarousel extends Component {
     });
   };
 
-  handleTouchMove = (e) => {
+  handleSwipeMove = (e) => {
+    /*
+      se quisermos desabilitar o click de links dentro do carousel precisariamos desabilitar todos os links com o getElementByTagName,
+      e habilitar novamente no touchEnd, mas por ora decidimos não implementar
+    */
     if (this.state.started) {
       const returnedState = handleScrollOrSwipe(e, this.state);
       this.setState(returnedState);
@@ -105,7 +110,7 @@ class YanariCarousel extends Component {
     }
   };
 
-  handleTouchEnd = (e) => {
+  handleSwipeEnd = (e) => {
     if (this.state.started) {
       this.handleAnimationAndSetState();
       const deltaX = unify(e).clientX - this.state.initialPositionX;
