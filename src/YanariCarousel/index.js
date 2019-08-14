@@ -4,7 +4,12 @@ import React, {Component, createRef} from 'react';
 import PropTypes from 'prop-types';
 import CarouselArrow from './CarouselArrow';
 import CarouselDots from './CarouselDots';
-import {handleScrollOrSwipe, unify} from './utils/helper';
+import {
+  handleScrollOrSwipe,
+  isNotFirstItem,
+  isNotLastItem,
+  unify,
+} from './utils/helper';
 
 class YanariCarousel extends Component {
   constructor (props) {
@@ -81,19 +86,16 @@ class YanariCarousel extends Component {
       this.setState(returnedState);
       if (this.state.isScrolling) return;
       else if (this.state.isSwiping) e.preventDefault();
-      const {items} = this.props;
       const deltaX = unify(e).clientX - this.state.initialPositionX;
-      const isNotFirstItem = this.state.carouselIndex < items.length - 1;
-      const isNotLastItem = this.state.carouselIndex > 0;
       const threshold = this.state.itemsWidth / 4;
       // impedir que o usuario swipe pro lado esquerdo qd é o ultimo item e pro lado direito quando é o primeiro item
-      if (!isNotFirstItem && deltaX < -threshold) {
+      if (!isNotLastItem(this.state, this.props) && deltaX < -threshold) {
         this.setState({
           positionX: -threshold,
         });
         return;
       }
-      if (!isNotLastItem && deltaX > threshold) {
+      if (!isNotFirstItem(this.state) && deltaX > threshold) {
         this.setState({
           positionX: threshold,
         });
@@ -113,7 +115,7 @@ class YanariCarousel extends Component {
 
   handleSwipeEnd = (e) => {
     if (this.state.started) {
-      const {itemMargin} = this.props;
+      const {itemMargin, items} = this.props;
       this.handleAnimationAndSetState();
       const deltaX = unify(e).clientX - this.state.initialPositionX;
       const transition = -((this.state.itemsWidth + (itemMargin * 2)) * this.state.carouselIndex) + this.state.positionX;
@@ -121,8 +123,15 @@ class YanariCarousel extends Component {
       const isValidSwipe = Math.abs(deltaX) >= threshold; // tem que ser no minimo metade do container pra mudar de indice
       if (this.state.isSwiping) {
         const containerWidth = this.refContainer.current.getBoundingClientRect().width;
+        const lastPossibleSwipePoint = -((this.state.itemsWidth + (itemMargin * 2)) * (items.length - 1) + threshold);
         if (Math.abs(deltaX) > containerWidth) { // se o movimento é maior do que a largura do container é pq a pessoa quer setar a index parando nela
-          this.setCarouselIndex(Math.floor(Math.abs(transition) / this.state.itemsWidth));
+          if (transition > threshold) {
+            this.setCarouselIndex(0);
+          } else if (transition < lastPossibleSwipePoint) {
+            this.setCarouselIndex(items.length - 1);
+          } else {
+            this.setCarouselIndex(Math.floor(Math.abs(transition) / this.state.itemsWidth));
+          }
         } else {
           if (deltaX > 0 && isValidSwipe) { // delta positivo quer dizer que foi swipado pra direita
             this.handleDecrementIndex();
@@ -142,16 +151,13 @@ class YanariCarousel extends Component {
   };
 
   handleIncrementIndex = () => {
-    const {items} = this.props;
-    const isNotLastItem = this.state.carouselIndex < items.length - 1;
-    if (isNotLastItem) {
+    if (isNotLastItem(this.state, this.props)) {
       this.handleAnimationAndSetState({carouselIndex: this.state.carouselIndex + 1});
     }
   };
 
   handleDecrementIndex = () => {
-    const isNotFirstItem = this.state.carouselIndex > 0;
-    if (isNotFirstItem) {
+    if (isNotFirstItem(this.state)) {
       this.handleAnimationAndSetState({carouselIndex: this.state.carouselIndex - 1});
     }
   };

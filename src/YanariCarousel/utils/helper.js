@@ -23,3 +23,14 @@ export const handleScrollOrSwipe = (e, state) => {
 export const unify = (e) => {
   return e.changedTouches ? e.changedTouches[0] : e;
 };
+
+export const isNotLastItem = (state, props) => {
+  const {carouselIndex} = state;
+  const {items} = props;
+  return carouselIndex < items.length - 1;
+};
+
+export const isNotFirstItem = (state) => {
+  const {carouselIndex} = state;
+  return carouselIndex > 0;
+};
