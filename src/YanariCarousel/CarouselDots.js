@@ -11,16 +11,16 @@ function CarouselDots (props) {
     setCarouselIndex,
   } = props;
   return (
-    <div className = "myy-carousel__dots-container">
+    <div className = "yanari-carousel__dots-container">
       {items.map((data, index) => {
         return (
           <button
-            className = "myy-carousel__dot-button"
+            className = "yanari-carousel__dot-button"
             key = {index}
             onClick = {() => setCarouselIndex(index)}
             type = "button"
           >
-            <div className = {cn('myy-carousel__dot', {'active': index === carouselIndex})}/>
+            <div className = {cn('yanari-carousel__dot', {'active': index === carouselIndex})}/>
           </button>
         );
       })}
