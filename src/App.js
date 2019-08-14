@@ -21,7 +21,7 @@ function App() {
     );
   };
   return (
-    <div style = {{marginTop: 48}}>
+    <div style = {{margin: '48px 300px'}}>
       <YanariCarousel
         hasArrows = {true}
         itemRenderer = {itemRenderer}

@@ -37,6 +37,7 @@ class YanariCarousel extends Component {
     this.refItemsContainer.current.addEventListener('mousedown', this.handleSwipeStart);
     this.refItemsContainer.current.addEventListener('touchmove', this.handleSwipeMove, {passive: false});
     document.addEventListener('mousemove', this.handleSwipeMove, {passive: false});
+    // o event listener nao ta no ref pq a pessoa pode soltar ou mover o cursor do mouse fora da area do carousel
     this.refItemsContainer.current.addEventListener('touchend', this.handleSwipeEnd, {passive: false});
     document.addEventListener('mouseup', this.handleSwipeEnd);
     this.setState({
@@ -112,15 +113,22 @@ class YanariCarousel extends Component {
 
   handleSwipeEnd = (e) => {
     if (this.state.started) {
+      const {itemMargin} = this.props;
       this.handleAnimationAndSetState();
       const deltaX = unify(e).clientX - this.state.initialPositionX;
+      const transition = -((this.state.itemsWidth + (itemMargin * 2)) * this.state.carouselIndex) + this.state.positionX;
       const threshold = this.state.itemsWidth / 4; // movimento minimo pra ser considerado um swipe
       const isValidSwipe = Math.abs(deltaX) >= threshold; // tem que ser no minimo metade do container pra mudar de indice
       if (this.state.isSwiping) {
-        if (deltaX > 0 && isValidSwipe) { // delta positivo quer dizer que foi swipado pra direita
-          this.handleDecrementIndex();
-        } else if (deltaX < 0 && isValidSwipe) { // delta negativo indica que foi swipado pra esquerda
-          this.handleIncrementIndex();
+        const containerWidth = this.refContainer.current.getBoundingClientRect().width;
+        if (Math.abs(deltaX) > containerWidth) { // se o movimento é maior do que a largura do container é pq a pessoa quer setar a index parando nela
+          this.setCarouselIndex(Math.floor(Math.abs(transition) / this.state.itemsWidth));
+        } else {
+          if (deltaX > 0 && isValidSwipe) { // delta positivo quer dizer que foi swipado pra direita
+            this.handleDecrementIndex();
+          } else if (deltaX < 0 && isValidSwipe) { // delta negativo indica que foi swipado pra esquerda
+            this.handleIncrementIndex();
+          }
         }
       }
       this.setState({
@@ -166,12 +174,12 @@ class YanariCarousel extends Component {
       arrowSize,
       hasArrows,
       hasDots,
+      itemMargin,
       itemRenderer,
       items,
       itemPreviewSize,
       showPrevAndNext,
     } = this.props;
-    const itemMargin = 8;
     const transition = -((this.state.itemsWidth + (itemMargin * 2)) * this.state.carouselIndex) + this.state.positionX;
     const itemsContainerStyle = {
       transform: 'translate3d(' + transition + 'px, 0, 0)', // o que indica a posição
@@ -251,6 +259,7 @@ YanariCarousel.propTypes = {
   arrowSize: PropTypes.number,
   hasArrows: PropTypes.bool,
   hasDots: PropTypes.bool,
+  itemMargin: PropTypes.number,
   itemPreviewSize: PropTypes.number,
   itemRenderer: PropTypes.func.isRequired,
   items: PropTypes.instanceOf(Object).isRequired,
@@ -260,6 +269,7 @@ YanariCarousel.propTypes = {
 
 YanariCarousel.defaultProps = {
   arrowSize: 32,
+  itemMargin: 8,
   itemPreviewSize: 32,
   startIndex: 0,
   showPrevAndNext: true,
