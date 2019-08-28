@@ -15,13 +15,6 @@
   width: 100%;
 }
 
-.yanari-carousel > .yanari-carousel__flex-container > .yanari-carousel__arrow {
-  align-items: center;
-  cursor: pointer;
-  display: flex;
-  flex: 0;
-}
-
 .yanari-carousel > .yanari-carousel__flex-container > .yanari-carousel__items-wrapper {
   display: flex;
   flex: 1;
@@ -38,8 +31,4 @@
 
 .yanari-carousel > .yanari-carousel__flex-container .yanari-carousel__item:last-child {
   margin-right: 0 !important;
-}
-
-.yanari-carousel__preview-button {
-  z-index: 1;
 }

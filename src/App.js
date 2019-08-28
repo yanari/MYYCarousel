@@ -25,10 +25,12 @@ function App() {
       arrows = {{
         left: {
           label: '<',
+          margin: 8,
           size: 32,
         },
         right: {
           label: '>',
+          margin: 8,
           size: 32,
         },
       }}

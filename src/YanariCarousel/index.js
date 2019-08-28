@@ -2,6 +2,7 @@ import './index.css';
 
 import React, {Component, createRef} from 'react';
 import PropTypes from 'prop-types';
+import CarouselArrow from './CarouselArrow';
 import CarouselDots from './CarouselDots';
 import {
   handleScrollOrSwipe,
@@ -34,7 +35,7 @@ class YanariCarousel extends Component {
       itemPreviewSize,
       showPrevAndNext,
     } = this.props;
-    const arrowMargins = arrows ? (arrows.left.size + arrows.right.size) : 0;
+    const arrowMargins = arrows ? (arrows.left.size + arrows.left.margin + arrows.right.size + arrows.right.margin) : 0;
     const itemPreviewMargins = showPrevAndNext ? (itemPreviewSize.left + itemPreviewSize.right) : null;
     this.refItemsContainer.current.addEventListener('touchstart', this.handleSwipeStart);
     this.refItemsContainer.current.addEventListener('mousedown', this.handleSwipeStart);
@@ -70,6 +71,7 @@ class YanariCarousel extends Component {
       initialPositionY: unify(e).clientY,
       // diferença entre o ponto que o cursor esta na hora do click e a esquerda do container (levando em conta margins e paddings)
       offsetCursor: unify(e).clientX - this.refContainer.current.offsetLeft,
+      // nos eventos do mouse precisa ter começado o swipe pro mousemove não ficar doido
       started: true,
     });
   };
@@ -123,11 +125,11 @@ class YanariCarousel extends Component {
         const containerWidth = this.refContainer.current.getBoundingClientRect().width;
         const lastPossibleSwipePoint = -((this.state.itemsWidth + (itemMargin * 2)) * (items.length - 1) + threshold);
         if (Math.abs(deltaX) > containerWidth) { // se o movimento é maior do que a largura do container é pq a pessoa quer setar a index parando nela
-          if (transition > threshold) {
+          if (transition > threshold) { // o swipe chegou no primeiro item
             this.setCarouselIndex(0);
-          } else if (transition < lastPossibleSwipePoint) {
+          } else if (transition < lastPossibleSwipePoint) { // o swipe chegou no ultimo item
             this.setCarouselIndex(items.length - 1);
-          } else {
+          } else { // o swipe parou entre o primeiro e o ultimo item (a ser calculado)
             this.setCarouselIndex(Math.floor(Math.abs(transition) / this.state.itemsWidth));
           }
         } else {
@@ -181,6 +183,7 @@ class YanariCarousel extends Component {
       itemRenderer,
       items,
       itemPreviewSize,
+      previewIsClickable,
       showPrevAndNext,
     } = this.props;
     const transition = -((this.state.itemsWidth + (itemMargin * 2)) * this.state.carouselIndex) + this.state.positionX;
@@ -196,19 +199,20 @@ class YanariCarousel extends Component {
     return (
       <div className = "yanari-carousel" ref = {this.refContainer}>
         <div className = "yanari-carousel__flex-container">
-          {arrows ? (
-            <div
-              className = "yanari-carousel__arrow"
-              style = {{fontSize: arrows.left.size}}
-            >
-              {arrows.left.label}
-            </div>
+          {arrows && arrows.left ? (
+            <CarouselArrow
+              arrow = {arrows.left}
+              direction = 'left'
+              handleClick = {this.handleDecrementIndex}
+              isInactive = {!isNotFirstItem(this.state)}
+            />
           ) : null}
           <div className = "yanari-carousel__items-wrapper">
             {showPrevAndNext ? (
               <button
                 className = "yanari-carousel__preview-button"
                 onClick = {this.handleDecrementIndex}
+                style = {{zIndex: previewIsClickable ? 1 : -1}}
                 type = "button"
               >
                 <div style = {{minHeight: 1, width: itemPreviewSize.left}}/>
@@ -233,19 +237,20 @@ class YanariCarousel extends Component {
               <button
                 className = "yanari-carousel__preview-button"
                 onClick = {this.handleIncrementIndex}
+                style = {{zIndex: previewIsClickable ? 1 : -1}}
                 type = "button"
               >
                 <div style = {{minHeight: 1, width: itemPreviewSize.right}}/>
               </button>
             ) : null}
           </div>
-          {arrows ? (
-            <div
-              className = "yanari-carousel__arrow"
-              style = {{fontSize: arrows.right.size}}
-            >
-              {arrows.right.label}
-            </div>
+          {arrows && arrows.right ? (
+            <CarouselArrow
+              arrow = {arrows.right}
+              direction = 'right'
+              handleClick = {this.handleIncrementIndex}
+              isInactive = {!isNotLastItem(this.state, this.props)}
+            />
           ) : null}
         </div>
         {hasDots ? (
@@ -267,12 +272,14 @@ YanariCarousel.propTypes = {
   itemRenderer: PropTypes.func.isRequired,
   items: PropTypes.instanceOf(Object).isRequired,
   itemPreviewSize: PropTypes.instanceOf(Object).isRequired,
+  previewIsClickable: PropTypes.bool,
   showPrevAndNext: PropTypes.bool,
   startIndex: PropTypes.number,
 };
 
 YanariCarousel.defaultProps = {
   itemMargin: 8,
+  previewIsClickable: false,
   startIndex: 0,
   showPrevAndNext: true,
 };
