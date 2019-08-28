@@ -21,36 +21,24 @@ function App() {
     );
   };
   return (
-    <div>
-      <YanariCarousel
-        hasArrows = {true}
-        itemRenderer = {itemRenderer}
-        items = {lista}
-        itemPreviewSize = {64}
-      />
-      <p>Lorem d;asjd;as askldh akls hd</p>
-      <p>Lorem d;asjd;as askldh akls hd</p>
-      <p>Lorem d;asjd;as askldh akls hd</p>
-      <p>Lorem d;asjd;as askldh akls hd</p>
-      <p>Lorem d;asjd;as askldh akls hd</p>
-      <p>Lorem d;asjd;as askldh akls hd</p>
-      <p>Lorem d;asjd;as askldh akls hd</p>
-      <p>Lorem d;asjd;as askldh akls hd</p>
-      <p>Lorem d;asjd;as askldh akls hd</p>
-      <p>Lorem d;asjd;as askldh akls hd</p>
-      <p>Lorem d;asjd;as askldh akls hd</p>
-      <p>Lorem d;asjd;as askldh akls hd</p>
-      <p>Lorem d;asjd;as askldh akls hd</p>
-      <p>Lorem d;asjd;as askldh akls hd</p>
-      <p>Lorem d;asjd;as askldh akls hd</p>
-      <p>Lorem d;asjd;as askldh akls hd</p>
-      <p>Lorem d;asjd;as askldh akls hd</p>
-      <p>Lorem d;asjd;as askldh akls hd</p>
-      <p>Lorem d;asjd;as askldh akls hd</p>
-      <p>Lorem d;asjd;as askldh akls hd</p>
-      <p>Lorem d;asjd;as askldh akls hd</p>
-      <p>Lorem d;asjd;as askldh akls hd</p>
-    </div>
+    <YanariCarousel
+      arrows = {{
+        left: {
+          label: '<',
+          size: 32,
+        },
+        right: {
+          label: '>',
+          size: 32,
+        },
+      }}
+      itemRenderer = {itemRenderer}
+      items = {lista}
+      itemPreviewSize = {{
+        left: 0,
+        right: 80,
+      }}
+    />
   );
 }
 

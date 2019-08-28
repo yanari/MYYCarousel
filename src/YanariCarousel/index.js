@@ -31,13 +31,12 @@ class YanariCarousel extends Component {
 
   componentDidMount () {
     const {
-      arrowSize,
-      hasArrows,
+      arrows,
       itemPreviewSize,
       showPrevAndNext,
     } = this.props;
-    const arrowMargins = hasArrows ? (arrowSize * 2) : 0;
-    const itemPreviewMargins = showPrevAndNext ? (itemPreviewSize * 2) : null;
+    const arrowMargins = arrows ? (arrows.left.size + arrows.right.size) : 0;
+    const itemPreviewMargins = showPrevAndNext ? (itemPreviewSize.left + itemPreviewSize.right) : null;
     this.refItemsContainer.current.addEventListener('touchstart', this.handleSwipeStart);
     this.refItemsContainer.current.addEventListener('mousedown', this.handleSwipeStart);
     this.refItemsContainer.current.addEventListener('touchmove', this.handleSwipeMove, {passive: false});
@@ -177,8 +176,7 @@ class YanariCarousel extends Component {
 
   render () {
     const {
-      arrowSize,
-      hasArrows,
+      arrows,
       hasDots,
       itemMargin,
       itemRenderer,
@@ -199,12 +197,13 @@ class YanariCarousel extends Component {
     return (
       <div className = "yanari-carousel" ref = {this.refContainer}>
         <div className = "yanari-carousel__flex-container">
-          {hasArrows ? (
-            <CarouselArrow
-              direction = "left"
-              handleClick = {this.handleDecrementIndex}
-              size = {arrowSize}
-            />
+          {arrows ? (
+            <div
+              className = "yanari-carousel__arrow"
+              style = {{fontSize: arrows.left.size}}
+            >
+              {arrows.left.label}
+            </div>
           ) : null}
           <div className = "yanari-carousel__items-wrapper">
             {showPrevAndNext ? (
@@ -213,7 +212,7 @@ class YanariCarousel extends Component {
                 onClick = {this.handleDecrementIndex}
                 type = "button"
               >
-                <div style = {{height: itemPreviewSize, width: itemPreviewSize}}/>
+                <div style = {{minHeight: 1, width: itemPreviewSize.left}}/>
               </button>
             ) : null}
             <div className = "yanari-carousel__item-container-wrapper" style = {{width: this.state.itemsWidth}}>
@@ -237,16 +236,17 @@ class YanariCarousel extends Component {
                 onClick = {this.handleIncrementIndex}
                 type = "button"
               >
-                <div style = {{height: itemPreviewSize, width: itemPreviewSize}}/>
+                <div style = {{minHeight: 1, width: itemPreviewSize.right}}/>
               </button>
             ) : null}
           </div>
-          {hasArrows ? (
-            <CarouselArrow
-              direction = "right"
-              handleClick = {this.handleIncrementIndex}
-              size = {arrowSize}
-            />
+          {arrows ? (
+            <div
+              className = "yanari-carousel__arrow"
+              style = {{fontSize: arrows.right.size}}
+            >
+              {arrows.right.label}
+            </div>
           ) : null}
         </div>
         {hasDots ? (
@@ -262,21 +262,18 @@ class YanariCarousel extends Component {
 }
 
 YanariCarousel.propTypes = {
-  arrowSize: PropTypes.number,
-  hasArrows: PropTypes.bool,
+  arrows: PropTypes.instanceOf(Object),
   hasDots: PropTypes.bool,
   itemMargin: PropTypes.number,
-  itemPreviewSize: PropTypes.number,
   itemRenderer: PropTypes.func.isRequired,
   items: PropTypes.instanceOf(Object).isRequired,
+  itemPreviewSize: PropTypes.instanceOf(Object).isRequired,
   showPrevAndNext: PropTypes.bool,
   startIndex: PropTypes.number,
 };
 
 YanariCarousel.defaultProps = {
-  arrowSize: 32,
   itemMargin: 8,
-  itemPreviewSize: 32,
   startIndex: 0,
   showPrevAndNext: true,
 };
