@@ -9,7 +9,7 @@ import {
   isNotFirstItem,
   isNotLastItem,
   unify,
-} from './utils/helper';
+} from './helper';
 
 class YanariCarousel extends Component {
   constructor (props) {
