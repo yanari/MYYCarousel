@@ -4,10 +4,18 @@ import React, {Component, createRef} from 'react';
 import PropTypes from 'prop-types';
 import CarouselArrow from './CarouselArrow';
 import CarouselDots from './CarouselDots';
+import CarouselPreviewItem from './CarouselPreviewItem';
 import {
+  addEventListeners,
+  getCarouselIndexOnTouchEnd,
+  getDeltaX,
+  getThreshold,
+  getTransition,
   handleScrollOrSwipe,
   isNotFirstItem,
   isNotLastItem,
+  getPositionX,
+  removeEventListeners,
   unify,
 } from './helper';
 
@@ -30,32 +38,17 @@ class YanariCarousel extends Component {
   }
 
   componentDidMount () {
-    const {
-      arrows,
-      itemPreviewSize,
-      showPrevAndNext,
-    } = this.props;
+    const {arrows, itemPreviewSize, showPrevAndNext} = this.props;
     const arrowMargins = arrows ? (arrows.left.size + arrows.left.margin + arrows.right.size + arrows.right.margin) : 0;
     const itemPreviewMargins = showPrevAndNext ? (itemPreviewSize.left + itemPreviewSize.right) : null;
-    this.refItemsContainer.current.addEventListener('touchstart', this.handleSwipeStart);
-    this.refItemsContainer.current.addEventListener('mousedown', this.handleSwipeStart);
-    this.refItemsContainer.current.addEventListener('touchmove', this.handleSwipeMove, {passive: false});
-    document.addEventListener('mousemove', this.handleSwipeMove, {passive: false});
-    // o event listener nao ta no ref pq a pessoa pode soltar ou mover o cursor do mouse fora da area do carousel
-    this.refItemsContainer.current.addEventListener('touchend', this.handleSwipeEnd, {passive: false});
-    document.addEventListener('mouseup', this.handleSwipeEnd);
     this.setState({
       itemsWidth: this.refContainer.current.getBoundingClientRect().width - (arrowMargins + itemPreviewMargins),
     });
+    addEventListeners(this.handleSwipeStart, this.handleSwipeMove, this.handleSwipeEnd, this.refItemsContainer);
   }
 
   componentWillUnmount () {
-    this.refItemsContainer.current.removeEventListener('touchstart', this.handleSwipeStart);
-    this.refItemsContainer.current.removeEventListener('mousedown', this.handleSwipeStart);
-    this.refItemsContainer.current.removeEventListener('touchmove', this.handleSwipeMove, {passive: false});
-    document.removeEventListener('mousemove', this.handleSwipeMove, {passive: false});
-    this.refItemsContainer.current.removeEventListener('touchend', this.handleSwipeEnd, {passive: false});
-    document.removeEventListener('mouseup', this.handleSwipeEnd);
+    removeEventListeners(this.handleSwipeStart, this.handleSwipeMove, this.handleSwipeEnd, this.refItemsContainer);
   }
 
   setCarouselIndex = (carouselIndex) => {
@@ -86,18 +79,10 @@ class YanariCarousel extends Component {
       this.setState(returnedState);
       if (this.state.isScrolling) return;
       else if (this.state.isSwiping) e.preventDefault();
-      const deltaX = unify(e).clientX - this.state.initialPositionX;
-      const threshold = this.state.itemsWidth / 4;
-      // impedir que o usuario swipe pro lado esquerdo qd é o ultimo item e pro lado direito quando é o primeiro item
-      if (!isNotLastItem(this.state, this.props) && deltaX < -threshold) {
+      const newPositionX = getPositionX(e, this.state, this.props);
+      if (newPositionX) {
         this.setState({
-          positionX: -threshold,
-        });
-        return;
-      }
-      if (!isNotFirstItem(this.state) && deltaX > threshold) {
-        this.setState({
-          positionX: threshold,
+          positionX: newPositionX,
         });
         return;
       }
@@ -115,23 +100,15 @@ class YanariCarousel extends Component {
 
   handleSwipeEnd = (e) => {
     if (this.state.started) {
-      const {itemMargin, items} = this.props;
       this.handleAnimationAndSetState();
-      const deltaX = unify(e).clientX - this.state.initialPositionX;
-      const transition = -((this.state.itemsWidth + (itemMargin * 2)) * this.state.carouselIndex) + this.state.positionX;
-      const threshold = this.state.itemsWidth / 4; // movimento minimo pra ser considerado um swipe
+      const deltaX = getDeltaX(e, this.state);
+      const threshold = getThreshold(this.state);
       const isValidSwipe = Math.abs(deltaX) >= threshold; // tem que ser no minimo metade do container pra mudar de indice
       if (this.state.isSwiping) {
         const containerWidth = this.refContainer.current.getBoundingClientRect().width;
-        const lastPossibleSwipePoint = -((this.state.itemsWidth + (itemMargin * 2)) * (items.length - 1) + threshold);
         if (Math.abs(deltaX) > containerWidth) { // se o movimento é maior do que a largura do container é pq a pessoa quer setar a index parando nela
-          if (transition > threshold) { // o swipe chegou no primeiro item
-            this.setCarouselIndex(0);
-          } else if (transition < lastPossibleSwipePoint) { // o swipe chegou no ultimo item
-            this.setCarouselIndex(items.length - 1);
-          } else { // o swipe parou entre o primeiro e o ultimo item (a ser calculado)
-            this.setCarouselIndex(Math.floor(Math.abs(transition) / this.state.itemsWidth));
-          }
+          const newCarouselIndex = getCarouselIndexOnTouchEnd(this.state, this.props);
+          this.setCarouselIndex(newCarouselIndex);
         } else {
           if (deltaX > 0 && isValidSwipe) { // delta positivo quer dizer que foi swipado pra direita
             this.handleDecrementIndex();
@@ -186,7 +163,7 @@ class YanariCarousel extends Component {
       previewIsClickable,
       showPrevAndNext,
     } = this.props;
-    const transition = -((this.state.itemsWidth + (itemMargin * 2)) * this.state.carouselIndex) + this.state.positionX;
+    const transition = getTransition(this.state, this.props);
     const itemsContainerStyle = {
       transform: 'translate3d(' + transition + 'px, 0, 0)', // o que indica a posição
       transition: this.state.animate ? 'transform 275ms ease' : null, // anima so no touch end
@@ -209,14 +186,11 @@ class YanariCarousel extends Component {
           ) : null}
           <div className = "yanari-carousel__items-wrapper">
             {showPrevAndNext ? (
-              <button
-                className = "yanari-carousel__preview-button"
-                onClick = {this.handleDecrementIndex}
-                style = {{zIndex: previewIsClickable ? 1 : -1}}
-                type = "button"
-              >
-                <div style = {{minHeight: 1, width: itemPreviewSize.left}}/>
-              </button>
+              <CarouselPreviewItem
+                handleClick = {this.handleDecrementIndex}
+                itemPreviewSize = {itemPreviewSize.left}
+                previewIsClickable = {previewIsClickable}
+              />
             ) : null}
             <div className = "yanari-carousel__item-container-wrapper" style = {{width: this.state.itemsWidth}}>
               <div className = "yanari-carousel__item-container" ref = {this.refItemsContainer} style = {itemsContainerStyle}>
@@ -234,14 +208,11 @@ class YanariCarousel extends Component {
               </div>
             </div>
             {showPrevAndNext ? (
-              <button
-                className = "yanari-carousel__preview-button"
-                onClick = {this.handleIncrementIndex}
-                style = {{zIndex: previewIsClickable ? 1 : -1}}
-                type = "button"
-              >
-                <div style = {{minHeight: 1, width: itemPreviewSize.right}}/>
-              </button>
+              <CarouselPreviewItem
+                handleClick = {this.handleIncrementIndex}
+                itemPreviewSize = {itemPreviewSize.right}
+                previewIsClickable = {previewIsClickable}
+              />
             ) : null}
           </div>
           {arrows && arrows.right ? (
