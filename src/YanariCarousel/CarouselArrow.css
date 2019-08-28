@@ -1,8 +1,0 @@
-.yanari-carousel__arrow-button {
-  --yanari-carousel-arrow-size: null;
-}
-
-.yanari-carousel__arrow-button > .svg-icon > svg {
-  height: var(--yanari-carousel-arrow-size);
-  width: var(--yanari-carousel-arrow-size);
-}

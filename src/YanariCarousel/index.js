@@ -2,7 +2,6 @@ import './index.css';
 
 import React, {Component, createRef} from 'react';
 import PropTypes from 'prop-types';
-import CarouselArrow from './CarouselArrow';
 import CarouselDots from './CarouselDots';
 import {
   handleScrollOrSwipe,
