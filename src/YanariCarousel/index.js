@@ -91,10 +91,6 @@ class YanariCarousel extends Component {
         });
         return;
       }
-      // travar o positionX
-      if (!this.refItemsContainer.current.contains(e.target)) {
-        return;
-      }
       if (this.state.isSwiping) {
         this.setState((prevState) => {
           return {
@@ -126,7 +122,7 @@ class YanariCarousel extends Component {
         isSwiping: false,
         positionX: 0,
         started: false,
-      }); // reseta os valores
+      });
     }
   };
 

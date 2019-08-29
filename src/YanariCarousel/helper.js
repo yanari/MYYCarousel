@@ -54,6 +54,7 @@ export const addEventListeners = (handleSwipeStart, handleSwipeMove, handleSwipe
   document.addEventListener('mousemove', handleSwipeMove, {passive: false});
   // o event listener nao ta no ref pq a pessoa pode soltar ou mover o cursor do mouse fora da area do carousel
   refItemsContainer.current.addEventListener('touchend', handleSwipeEnd, {passive: false});
+  refItemsContainer.current.addEventListener('mouseleave', handleSwipeEnd);
   document.addEventListener('mouseup', handleSwipeEnd);
 };
 
@@ -63,5 +64,6 @@ export const removeEventListeners = (handleSwipeStart, handleSwipeMove, handleSw
   refItemsContainer.current.removeEventListener('touchmove', handleSwipeMove, {passive: false});
   document.removeEventListener('mousemove', handleSwipeMove, {passive: false});
   refItemsContainer.current.removeEventListener('touchend', handleSwipeEnd, {passive: false});
+  refItemsContainer.current.removeEventListener('mouseleave', handleSwipeEnd);
   document.removeEventListener('mouseup', handleSwipeEnd);
 };
