@@ -36,9 +36,9 @@ class YanariCarousel extends Component {
   }
 
   componentDidMount () {
-    const {arrows, itemPreviewSize, showPrevAndNext} = this.props;
+    const {arrows, itemPreviewSize} = this.props;
     const arrowMargins = arrows ? (arrows.left.size + arrows.left.margin + arrows.right.size + arrows.right.margin) : 0;
-    const itemPreviewMargins = showPrevAndNext ? (itemPreviewSize.left + itemPreviewSize.right) : null;
+    const itemPreviewMargins = itemPreviewSize ? (itemPreviewSize.left + itemPreviewSize.right) : null;
     this.setState({
       itemsWidth: this.refContainer.current.getBoundingClientRect().width - (arrowMargins + itemPreviewMargins),
     });
@@ -160,7 +160,6 @@ class YanariCarousel extends Component {
       items,
       itemPreviewSize,
       previewIsClickable,
-      showPrevAndNext,
     } = this.props;
     const transition = getTransition(this.state, this.props);
     const itemsContainerStyle = {
@@ -184,7 +183,7 @@ class YanariCarousel extends Component {
             />
           ) : null}
           <div className = "yanari-carousel__items-wrapper">
-            {showPrevAndNext ? (
+            {itemPreviewSize && itemPreviewSize.left ? (
               <CarouselPreviewItem
                 handleClick = {this.handleDecrementIndex}
                 itemPreviewSize = {itemPreviewSize.left}
@@ -206,7 +205,7 @@ class YanariCarousel extends Component {
                 })}
               </div>
             </div>
-            {showPrevAndNext ? (
+            {itemPreviewSize && itemPreviewSize.right ? (
               <CarouselPreviewItem
                 handleClick = {this.handleIncrementIndex}
                 itemPreviewSize = {itemPreviewSize.right}
@@ -241,9 +240,8 @@ YanariCarousel.propTypes = {
   itemMargin: PropTypes.number,
   itemRenderer: PropTypes.func.isRequired,
   items: PropTypes.instanceOf(Object).isRequired,
-  itemPreviewSize: PropTypes.instanceOf(Object).isRequired,
+  itemPreviewSize: PropTypes.instanceOf(Object),
   previewIsClickable: PropTypes.bool,
-  showPrevAndNext: PropTypes.bool,
   startIndex: PropTypes.number,
 };
 
