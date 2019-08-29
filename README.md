@@ -1,11 +1,12 @@
-## Available Scripts
+## Props
 
-In the project directory, you can run:
-
-### `npm start` or `yarn start`
-
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
+| Prop               | Required | Description                                                                                                                     | Type   | Default |
+|--------------------|----------|---------------------------------------------------------------------------------------------------------------------------------|--------|---------|
+| arrows             |    No    | {left: {label: symbol or component to be used as the left arrow, margin: margin between arrow and items, size: size of arrows}} | Object |    -    |
+| hasDots            |    No    | Determines if has dots below                                                                                                    |  bool  |  false  |
+| itemMargin         |    No    | Margin between every item                                                                                                       | number |    8    |
+| itemRenderer       |    Yes   | Function which returns what is inside each item                                                                                 |  func  |    -    |
+| items              |    Yes   | List of items                                                                                                                   | Object |    -    |
+| itemPreviewSize    |    Yes   | {left: size of item preview on left, right: size of item preview on right}                                                      | Object |    -    |
+| previewIsClickable |    No    | If item preview is clickable                                                                                                    |  bool  |  false  |
+| startIndex         |    No    | Start index                                                                                                                     | number |    0    |
