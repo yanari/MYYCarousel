@@ -35,19 +35,6 @@ export const isNotFirstItem = (state) => {
   return carouselIndex > 0;
 };
 
-export const getCarouselIndexOnTouchEnd = (state, props) => {
-  const transition = getTransition(state, props);
-  const threshold = getThreshold(state);
-  const lastPossibleSwipePoint = -((state.itemsWidth + (props.itemMargin * 2)) * (props.items.length - 1) + threshold);
-  if (transition > threshold) { // o swipe chegou no primeiro item
-    return 0;
-  } else if (transition < lastPossibleSwipePoint) { // o swipe chegou no ultimo item
-    return props.items.length - 1;
-  } else { // o swipe parou entre o primeiro e o ultimo item (a ser calculado)
-    return Math.floor(Math.abs(transition) / state.itemsWidth);
-  }
-};
-
 export const getDeltaX = (e, state) => {
   return unify(e).clientX - state.initialPositionX;
 };

@@ -7,7 +7,6 @@ import CarouselDots from './CarouselDots';
 import CarouselPreviewItem from './CarouselPreviewItem';
 import {
   addEventListeners,
-  getCarouselIndexOnTouchEnd,
   getDeltaX,
   getThreshold,
   getTransition,
@@ -92,6 +91,10 @@ class YanariCarousel extends Component {
         });
         return;
       }
+      // travar o positionX
+      if (!this.refItemsContainer.current.contains(e.target)) {
+        return;
+      }
       if (this.state.isSwiping) {
         this.setState((prevState) => {
           return {
@@ -111,11 +114,7 @@ class YanariCarousel extends Component {
       const threshold = getThreshold(this.state);
       const isValidSwipe = Math.abs(deltaX) >= threshold; // tem que ser no minimo metade do container pra mudar de indice
       if (this.state.isSwiping) {
-        const containerWidth = this.refContainer.current.getBoundingClientRect().width;
-        if (Math.abs(deltaX) > containerWidth) { // se o movimento é maior do que a largura do container é pq a pessoa quer setar a index parando nela
-          const newCarouselIndex = getCarouselIndexOnTouchEnd(this.state, this.props);
-          this.setCarouselIndex(newCarouselIndex);
-        } else if (deltaX > 0 && isValidSwipe) { // delta positivo quer dizer que foi swipado pra direita
+        if (deltaX > 0 && isValidSwipe) { // delta positivo quer dizer que foi swipado pra direita
           this.handleDecrementIndex();
         } else if (deltaX < 0 && isValidSwipe) { // delta negativo indica que foi swipado pra esquerda
           this.handleIncrementIndex();
