@@ -14,7 +14,6 @@ import {
   handleScrollOrSwipe,
   isNotFirstItem,
   isNotLastItem,
-  getPositionX,
   removeEventListeners,
   unify,
 } from './helper';
@@ -79,10 +78,17 @@ class YanariCarousel extends Component {
       this.setState(returnedState);
       if (this.state.isScrolling) return;
       else if (this.state.isSwiping) e.preventDefault();
-      const newPositionX = getPositionX(e, this.state, this.props);
-      if (newPositionX) {
+      const deltaX = getDeltaX(e, this.state);
+      const threshold = getThreshold(this.state);
+      if (!isNotLastItem(this.state, this.props) && deltaX < -threshold) {
         this.setState({
-          positionX: newPositionX,
+          positionX: -threshold,
+        });
+        return;
+      }
+      if (!isNotFirstItem(this.state) && deltaX > threshold) {
+        this.setState({
+          positionX: threshold,
         });
         return;
       }
@@ -109,12 +115,10 @@ class YanariCarousel extends Component {
         if (Math.abs(deltaX) > containerWidth) { // se o movimento é maior do que a largura do container é pq a pessoa quer setar a index parando nela
           const newCarouselIndex = getCarouselIndexOnTouchEnd(this.state, this.props);
           this.setCarouselIndex(newCarouselIndex);
-        } else {
-          if (deltaX > 0 && isValidSwipe) { // delta positivo quer dizer que foi swipado pra direita
-            this.handleDecrementIndex();
-          } else if (deltaX < 0 && isValidSwipe) { // delta negativo indica que foi swipado pra esquerda
-            this.handleIncrementIndex();
-          }
+        } else if (deltaX > 0 && isValidSwipe) { // delta positivo quer dizer que foi swipado pra direita
+          this.handleDecrementIndex();
+        } else if (deltaX < 0 && isValidSwipe) { // delta negativo indica que foi swipado pra esquerda
+          this.handleIncrementIndex();
         }
       }
       this.setState({
@@ -179,7 +183,7 @@ class YanariCarousel extends Component {
           {arrows && arrows.left ? (
             <CarouselArrow
               arrow = {arrows.left}
-              direction = 'left'
+              direction = "left"
               handleClick = {this.handleDecrementIndex}
               isInactive = {!isNotFirstItem(this.state)}
             />
@@ -194,11 +198,11 @@ class YanariCarousel extends Component {
             ) : null}
             <div className = "yanari-carousel__item-container-wrapper" style = {{width: this.state.itemsWidth}}>
               <div className = "yanari-carousel__item-container" ref = {this.refItemsContainer} style = {itemsContainerStyle}>
-                {items.map((data, index) => {
+                {items.map((data) => {
                   return (
                     <div
                       className = "yanari-carousel__item"
-                      key = {index}
+                      key = {data.key}
                       style = {itemStyle}
                     >
                       {itemRenderer({data})}
@@ -218,7 +222,7 @@ class YanariCarousel extends Component {
           {arrows && arrows.right ? (
             <CarouselArrow
               arrow = {arrows.right}
-              direction = 'right'
+              direction = "right"
               handleClick = {this.handleIncrementIndex}
               isInactive = {!isNotLastItem(this.state, this.props)}
             />

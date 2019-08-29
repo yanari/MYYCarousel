@@ -60,19 +60,6 @@ export const getTransition = (state, props) => {
   return -((state.itemsWidth + (props.itemMargin * 2)) * state.carouselIndex) + state.positionX;
 };
 
-export const getPositionX = (e, state, props) => {
-  // impedir que o usuario swipe pro lado esquerdo qd é o ultimo item e pro lado direito quando é o primeiro item
-  const deltaX = getDeltaX(e, state);
-  const threshold = getThreshold(state);
-  if (!isNotLastItem(state, props) && deltaX < -threshold) {
-    return -threshold
-  }
-  if (!isNotFirstItem(state) && deltaX > threshold) {
-    return threshold;
-  }
-  return null;
-};
-
 export const addEventListeners = (handleSwipeStart, handleSwipeMove, handleSwipeEnd, refItemsContainer) => {
   refItemsContainer.current.addEventListener('touchstart', handleSwipeStart);
   refItemsContainer.current.addEventListener('mousedown', handleSwipeStart);

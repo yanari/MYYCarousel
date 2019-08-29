@@ -4,14 +4,14 @@ import './App.css';
 
 function App() {
   const lista = [
-    {color: 'rgb(40, 40, 194)', content: 'A'},
-    {color: 'rgb(0, 100, 200)', content: 'B'},
-    {color: 'rgb(100, 0, 200)', content: 'C'},
-    {color: 'rgb(100, 0, 0)', content: 'D'},
-    {color: 'rgb(0, 0, 200)', content: 'E'},
-    {color: 'rgb(200, 0, 200)', content: 'F'},
-    {color: 'rgb(0, 200, 200)', content: 'G'},
-    {color: 'rgb(50, 132, 200)', content: 'H'},
+    {color: 'rgb(40, 40, 194)', content: 'A', key: 0},
+    {color: 'rgb(0, 100, 200)', content: 'B', key: 1},
+    {color: 'rgb(100, 0, 200)', content: 'C', key: 2},
+    {color: 'rgb(100, 0, 0)', content: 'D', key: 3},
+    {color: 'rgb(0, 0, 200)', content: 'E', key: 4},
+    {color: 'rgb(200, 0, 200)', content: 'F', key: 5},
+    {color: 'rgb(0, 200, 200)', content: 'G', key: 6},
+    {color: 'rgb(50, 132, 200)', content: 'H', key: 7},
   ];
   const itemRenderer = ({data}) => {
     return (
