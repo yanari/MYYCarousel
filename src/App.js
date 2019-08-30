@@ -14,8 +14,17 @@ function App() {
     {color: 'rgb(50, 132, 200)', content: 'H', key: 7},
   ];
   const itemRenderer = ({data}) => {
+    const styles = {
+      backgroundColor: data.color,
+      fontSize: '6rem',
+      height: '100%',
+    };
     return (
-      <div className = "item" key = {data.content} style = {{backgroundColor: data.color, fontSize: '6rem', height: '100%'}}>
+      <div
+        className = "item"
+        key = {data.content}
+        style = {styles}
+      >
         {data.content}
       </div>
     );
