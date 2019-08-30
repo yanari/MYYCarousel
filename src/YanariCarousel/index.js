@@ -8,8 +8,8 @@ import CarouselPreviewItem from './CarouselPreviewItem';
 import {
   addEventListeners,
   getDeltaX,
+  getStyles,
   getThreshold,
-  getTransition,
   handleScrollOrSwipe,
   isNotFirstItem,
   isNotLastItem,
@@ -54,7 +54,7 @@ class YanariCarousel extends Component {
   };
 
   handleSwipeStart = (e) => {
-    e.preventDefault ? e.preventDefault() : e.returnValue = false; // pra nao rolar o drag and drop de links dentro do carousel
+    // e.preventDefault ? e.preventDefault() : e.returnValue = false; // pra nao rolar o drag and drop de links dentro do carousel
     this.setState({
       // so ta aqui pra calcular o delta
       initialPositionX: unify(e).clientX,
@@ -76,7 +76,8 @@ class YanariCarousel extends Component {
       const returnedState = handleScrollOrSwipe(e, this.state);
       this.setState(returnedState);
       if (this.state.isScrolling) return;
-      else if (this.state.isSwiping) e.preventDefault();
+      else if (this.state.isSwiping && e.cancelable) e.preventDefault();
+      // https://github.com/kenwheeler/slick/issues/1800
       const deltaX = getDeltaX(e, this.state);
       const threshold = getThreshold(this.state);
       if (!isNotLastItem(this.state, this.props) && deltaX < -threshold) {
@@ -155,22 +156,12 @@ class YanariCarousel extends Component {
     const {
       arrows,
       hasDots,
-      itemMargin,
       itemRenderer,
       items,
       itemPreviewSize,
       previewIsClickable,
     } = this.props;
-    const transition = getTransition(this.state, this.props);
-    const itemsContainerStyle = {
-      transform: 'translate3d(' + transition + 'px, 0, 0)', // o que indica a posição
-      transition: this.state.animate ? 'transform 275ms ease' : null, // anima so no touch end
-      width: (this.state.itemsWidth + (itemMargin * 2)) * items.length, // pra acomodar todos os itens horizontalmente um do lado do outro
-    };
-    const itemStyle = {
-      margin: '0 ' + itemMargin + 'px',
-      width: this.state.itemsWidth,
-    };
+    const [itemStyle, itemsContainerStyle] = getStyles(this.state, this.props);
     return (
       <div className = "yanari-carousel" ref = {this.refContainer}>
         <div className = "yanari-carousel__flex-container">
@@ -246,10 +237,10 @@ YanariCarousel.propTypes = {
 };
 
 YanariCarousel.defaultProps = {
+  hasDots: false,
   itemMargin: 8,
   previewIsClickable: false,
   startIndex: 0,
-  showPrevAndNext: true,
 };
 
 export default YanariCarousel;

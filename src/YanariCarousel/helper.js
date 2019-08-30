@@ -39,6 +39,20 @@ export const getDeltaX = (e, state) => {
   return unify(e).clientX - state.initialPositionX;
 };
 
+export const getStyles = (state, props) => {
+  const transition = getTransition(state, props);
+  const itemsContainerStyle = {
+    transform: 'translate3d(' + transition + 'px, 0, 0)', // o que indica a posição
+    transition: state.animate ? 'transform 275ms ease' : null, // anima so no touch end
+    width: (state.itemsWidth + (props.itemMargin * 2)) * props.items.length, // pra acomodar todos os itens horizontalmente um do lado do outro
+  };
+  const itemStyle = {
+    margin: '0 ' + props.itemMargin + 'px',
+    width: state.itemsWidth,
+  };
+  return [itemStyle, itemsContainerStyle];
+};
+
 export const getThreshold = (state) => { // movimento minimo pra ser considerado um swipe
   return state.itemsWidth / 4;
 };
