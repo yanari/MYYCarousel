@@ -12,10 +12,10 @@ function CarouselArrow (props) {
     isInactive,
   } = props;
   const classSet = cn(
-    'yanari-carousel__arrow', {
-      'yanari-carousel__arrow--left': direction === 'left',
+    'mycc-swipe__arrow', {
+      'mycc-swipe__arrow--left': direction === 'left',
     }, {
-      'yanari-carousel__arrow--right': direction === 'right',
+      'mycc-swipe__arrow--right': direction === 'right',
     }, {
       'is-inactive': isInactive,
     },
@@ -23,7 +23,7 @@ function CarouselArrow (props) {
   const styles = {
     marginLeft: direction === 'right' ? arrow.margin : 0,
     marginRight: direction === 'left' ? arrow.margin : 0,
-    width: arrow.size,
+    width: arrow.width,
   };
   return (
     <button
@@ -39,7 +39,11 @@ function CarouselArrow (props) {
 }
 
 CarouselArrow.propTypes = {
-  arrow: PropTypes.instanceOf(Object).isRequired,
+  arrow: PropTypes.shape({
+    label: PropTypes.oneOfType([PropTypes.node, PropTypes.string]).isRequired,
+    margin: PropTypes.number.isRequired,
+    width: PropTypes.number.isRequired,
+  }).isRequired,
   direction: PropTypes.oneOf(['left', 'right']).isRequired,
   handleClick: PropTypes.func.isRequired,
   isInactive: PropTypes.bool.isRequired,

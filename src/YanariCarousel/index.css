@@ -1,4 +1,4 @@
-.yanari-carousel {
+.mycc-swipe {
   align-items: center;
   display: flex;
   flex-direction: column;
@@ -7,7 +7,7 @@
   width: 100%;
 }
 
-.yanari-carousel > .yanari-carousel__flex-container {
+.mycc-swipe > .mycc-swipe__flex-container {
   display: flex;
   justify-content: center;
   touch-action: pan-y;
@@ -15,20 +15,20 @@
   width: 100%;
 }
 
-.yanari-carousel > .yanari-carousel__flex-container > .yanari-carousel__items-wrapper {
+.mycc-swipe > .mycc-swipe__flex-container > .mycc-swipe__items-wrapper {
   display: flex;
   flex: 1;
   overflow: hidden;
 }
 
-.yanari-carousel > .yanari-carousel__flex-container .yanari-carousel__item {
+.mycc-swipe > .mycc-swipe__flex-container .mycc-swipe__item {
   float: left;
 }
 
-.yanari-carousel > .yanari-carousel__flex-container .yanari-carousel__item:first-child {
+.mycc-swipe > .mycc-swipe__flex-container .mycc-swipe__item:first-child {
   margin-left: 0 !important;
 }
 
-.yanari-carousel > .yanari-carousel__flex-container .yanari-carousel__item:last-child {
+.mycc-swipe > .mycc-swipe__flex-container .mycc-swipe__item:last-child {
   margin-right: 0 !important;
 }

@@ -6,25 +6,25 @@ import PropTypes from 'prop-types';
 function CarouselPreviewItem (props) {
   const {
     handleClick,
-    itemPreviewSize,
-    previewIsClickable,
+    itemPreviewIsClickable,
+    itemPreviewWidth,
   } = props;
   return (
     <button
-      className = "yanari-carousel__preview-button"
+      className = "mycc-swipe__preview-button"
       onClick = {handleClick}
-      style = {{zIndex: previewIsClickable ? 1 : -1}}
+      style = {{zIndex: itemPreviewIsClickable ? 1 : -1}}
       type = "button"
     >
-      <div style = {{minHeight: 1, width: itemPreviewSize}}/>
+      <div style = {{minHeight: 1, width: itemPreviewWidth}}/>
     </button>
   );
 }
 
 CarouselPreviewItem.propTypes = {
   handleClick: PropTypes.func.isRequired,
-  itemPreviewSize: PropTypes.number.isRequired,
-  previewIsClickable: PropTypes.bool.isRequired,
+  itemPreviewIsClickable: PropTypes.bool.isRequired,
+  itemPreviewWidth: PropTypes.number.isRequired,
 };
 
 export default CarouselPreviewItem;

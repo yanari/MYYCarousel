@@ -7,14 +7,14 @@ import CarouselDots from './CarouselDots';
 import CarouselPreviewItem from './CarouselPreviewItem';
 import {
   addEventListeners,
+  getBehaviorStyles,
   getDeltaX,
-  getStyles,
   getThreshold,
   handleScrollOrSwipe,
   isNotFirstItem,
   isNotLastItem,
+  normalizeChangedTouches,
   removeEventListeners,
-  unify,
 } from './helper';
 
 class YanariCarousel extends Component {
@@ -36,11 +36,13 @@ class YanariCarousel extends Component {
   }
 
   componentDidMount () {
-    const {arrows, itemPreviewSize} = this.props;
-    const arrowMargins = arrows ? (arrows.left.size + arrows.left.margin + arrows.right.size + arrows.right.margin) : 0;
-    const itemPreviewMargins = itemPreviewSize ? (itemPreviewSize.left + itemPreviewSize.right) : null;
+    const {arrowConfig, itemPreviewConfig} = this.props;
+    const arrowSizes = arrowConfig
+      ? (arrowConfig.left.width + arrowConfig.left.margin + arrowConfig.right.width + arrowConfig.right.margin)
+      : 0;
+    const itemPreviewSizes = itemPreviewConfig ? (itemPreviewConfig.widthLeft + itemPreviewConfig.widthRight) : null;
     this.setState({
-      itemsWidth: this.refContainer.current.getBoundingClientRect().width - (arrowMargins + itemPreviewMargins),
+      itemsWidth: this.refContainer.current.getBoundingClientRect().width - (arrowSizes + itemPreviewSizes),
     });
     addEventListeners(this.handleSwipeStart, this.handleSwipeMove, this.handleSwipeEnd, this.refItemsContainer);
   }
@@ -50,36 +52,35 @@ class YanariCarousel extends Component {
   }
 
   setCarouselIndex = (carouselIndex) => {
-    this.handleAnimationAndSetState({carouselIndex});
+    this.handleAnimation({carouselIndex});
   };
 
   handleSwipeStart = (e) => {
     // e.preventDefault ? e.preventDefault() : e.returnValue = false; // pra nao rolar o drag and drop de links dentro do carousel MAS impede o usuario de scrollar no mobile
     this.setState({
       // so ta aqui pra calcular o delta
-      initialPositionX: unify(e).clientX,
+      initialPositionX: normalizeChangedTouches(e).clientX,
       // pra saber se ta scrollando ou swipando
-      initialPositionY: unify(e).clientY,
+      initialPositionY: normalizeChangedTouches(e).clientY,
       // diferença entre o ponto que o cursor esta na hora do click e a esquerda do container (levando em conta margins e paddings)
-      offsetCursor: unify(e).clientX - this.refContainer.current.offsetLeft,
+      offsetCursor: normalizeChangedTouches(e).clientX - this.refContainer.current.offsetLeft,
       // nos eventos do mouse precisa ter começado o swipe pro mousemove não ficar doido
       started: true,
     });
   };
 
   handleSwipeMove = (e) => {
-    /*
-      se quisermos desabilitar o click de links dentro do carousel precisariamos desabilitar todos os links com o getElementByTagName,
-      e habilitar novamente no touchEnd, mas por ora decidimos não implementar
-    */
+    // se quisermos desabilitar o click de links dentro do carousel precisariamos desabilitar todos os links com o getElementByTagName,
+    // e habilitar novamente no touchEnd, mas por ora decidimos não implementar
     if (this.state.started) {
       const returnedState = handleScrollOrSwipe(e, this.state);
       this.setState(returnedState);
       if (this.state.isScrolling) return;
       else if (this.state.isSwiping && e.cancelable) e.preventDefault();
-      // https://github.com/kenwheeler/slick/issues/1800
+      // motivo do e.cancelable: https://github.com/kenwheeler/slick/issues/1800
       const deltaX = getDeltaX(e, this.state);
       const threshold = getThreshold(this.state);
+      // limita o swipe caso seja primeiro ou ultimo item
       if (!isNotLastItem(this.state, this.props) && deltaX < -threshold) {
         this.setState({
           positionX: -threshold,
@@ -92,12 +93,13 @@ class YanariCarousel extends Component {
         });
         return;
       }
+      // responsavel pelo movimento
       if (this.state.isSwiping) {
         this.setState((prevState) => {
           return {
-            // acompanha pra onde o cursor ou dedo ta indo, tira qualquer margem ou padding que possa existir e subtrai a
-            // diferença entre onde o cursor/dedo tava na hora do touchstart e a esquerda do container
-            positionX: ((unify(e).clientX - this.refContainer.current.offsetLeft) - prevState.offsetCursor),
+            // acompanha pra onde o cursor ou dedo ta indo, tira qualquer margem ou padding que possa existir (state.offsetCursor)
+            // e subtrai a diferença entre onde o cursor/dedo tava na hora do touchstart e a esquerda do container (offsetLeft)
+            positionX: ((normalizeChangedTouches(e).clientX - this.refContainer.current.offsetLeft) - prevState.offsetCursor),
           };
         });
       }
@@ -106,7 +108,7 @@ class YanariCarousel extends Component {
 
   handleSwipeEnd = (e) => {
     if (this.state.started) {
-      this.handleAnimationAndSetState();
+      this.handleAnimation();
       const deltaX = getDeltaX(e, this.state);
       const threshold = getThreshold(this.state);
       const isValidSwipe = Math.abs(deltaX) >= threshold; // tem que ser no minimo metade do container pra mudar de indice
@@ -129,17 +131,19 @@ class YanariCarousel extends Component {
 
   handleIncrementIndex = () => {
     if (isNotLastItem(this.state, this.props)) {
-      this.handleAnimationAndSetState({carouselIndex: this.state.carouselIndex + 1});
+      this.handleAnimation({carouselIndex: this.state.carouselIndex + 1});
     }
   };
 
   handleDecrementIndex = () => {
     if (isNotFirstItem(this.state)) {
-      this.handleAnimationAndSetState({carouselIndex: this.state.carouselIndex - 1});
+      this.handleAnimation({carouselIndex: this.state.carouselIndex - 1});
     }
   };
 
-  handleAnimationAndSetState = (newState) => { // adiciona o transition e depois de 275ms retira
+  handleAnimation = (newState) => {
+    // adiciona o animate pro state e o render fica de olho nesse state pra adicionar ou remover o transform 275ms ease
+    // obrigada carousel do mercado livre
     this.setState({
       ...newState,
       animate: true,
@@ -154,39 +158,45 @@ class YanariCarousel extends Component {
 
   render () {
     const {
-      arrows,
+      arrowConfig,
       hasDots,
       itemRenderer,
       items,
-      itemPreviewSize,
-      previewIsClickable,
+      itemPreviewConfig,
     } = this.props;
-    const [itemStyle, itemsContainerStyle] = getStyles(this.state, this.props);
+    const [itemStyle, itemsContainerStyle] = getBehaviorStyles(this.state, this.props);
     return (
-      <div className = "yanari-carousel" ref = {this.refContainer}>
-        <div className = "yanari-carousel__flex-container">
-          {arrows && arrows.left ? (
+      <div className = "mycc-swipe" ref = {this.refContainer}>
+        <div className = "mycc-swipe__flex-container">
+          {arrowConfig && arrowConfig.left ? (
             <CarouselArrow
-              arrow = {arrows.left}
+              arrow = {arrowConfig.left}
               direction = "left"
               handleClick = {this.handleDecrementIndex}
               isInactive = {!isNotFirstItem(this.state)}
             />
           ) : null}
-          <div className = "yanari-carousel__items-wrapper">
-            {itemPreviewSize && itemPreviewSize.left ? (
+          <div className = "mycc-swipe__items-wrapper">
+            {itemPreviewConfig && itemPreviewConfig.widthLeft ? (
               <CarouselPreviewItem
                 handleClick = {this.handleDecrementIndex}
-                itemPreviewSize = {itemPreviewSize.left}
-                previewIsClickable = {previewIsClickable}
+                itemPreviewIsClickable = {itemPreviewConfig.isClickable}
+                itemPreviewWidth = {itemPreviewConfig.widthLeft}
               />
             ) : null}
-            <div className = "yanari-carousel__item-container-wrapper" style = {{width: this.state.itemsWidth}}>
-              <div className = "yanari-carousel__item-container" ref = {this.refItemsContainer} style = {itemsContainerStyle}>
+            <div
+              className = "mycc-swipe__item-container-wrapper"
+              style = {{width: this.state.itemsWidth}}
+            >
+              <div
+                className = "mycc-swipe__item-container"
+                ref = {this.refItemsContainer}
+                style = {itemsContainerStyle}
+              >
                 {items.map((data) => {
                   return (
                     <div
-                      className = "yanari-carousel__item"
+                      className = "mycc-swipe__item"
                       key = {data.key}
                       style = {itemStyle}
                     >
@@ -196,17 +206,17 @@ class YanariCarousel extends Component {
                 })}
               </div>
             </div>
-            {itemPreviewSize && itemPreviewSize.right ? (
+            {itemPreviewConfig && itemPreviewConfig.widthRight ? (
               <CarouselPreviewItem
                 handleClick = {this.handleIncrementIndex}
-                itemPreviewSize = {itemPreviewSize.right}
-                previewIsClickable = {previewIsClickable}
+                itemPreviewIsClickable = {itemPreviewConfig.isClickable}
+                itemPreviewWidth = {itemPreviewConfig.widthRight}
               />
             ) : null}
           </div>
-          {arrows && arrows.right ? (
+          {arrowConfig && arrowConfig.right ? (
             <CarouselArrow
-              arrow = {arrows.right}
+              arrow = {arrowConfig.right}
               direction = "right"
               handleClick = {this.handleIncrementIndex}
               isInactive = {!isNotLastItem(this.state, this.props)}
@@ -226,20 +236,39 @@ class YanariCarousel extends Component {
 }
 
 YanariCarousel.propTypes = {
-  arrows: PropTypes.instanceOf(Object),
+  arrowConfig: PropTypes.shape({
+    left: PropTypes.shape({
+      label: PropTypes.oneOfType([PropTypes.node, PropTypes.string]).isRequired,
+      margin: PropTypes.number.isRequired,
+      width: PropTypes.number.isRequired,
+    }),
+    right: PropTypes.shape({
+      label: PropTypes.oneOfType([PropTypes.node, PropTypes.string]).isRequired,
+      margin: PropTypes.number.isRequired,
+      width: PropTypes.number.isRequired,
+    }),
+  }),
   hasDots: PropTypes.bool,
+  // é usado no helper
+  // eslint-disable-next-line react/no-unused-prop-types
   itemMargin: PropTypes.number,
+  itemPreviewConfig: PropTypes.shape({
+    isClickable: PropTypes.bool,
+    widthLeft: PropTypes.number.isRequired,
+    widthRight: PropTypes.number.isRequired,
+  }),
   itemRenderer: PropTypes.func.isRequired,
   items: PropTypes.instanceOf(Object).isRequired,
-  itemPreviewSize: PropTypes.instanceOf(Object),
-  previewIsClickable: PropTypes.bool,
   startIndex: PropTypes.number,
 };
 
 YanariCarousel.defaultProps = {
+  arrowConfig: null,
   hasDots: false,
   itemMargin: 8,
-  previewIsClickable: false,
+  itemPreviewConfig: {
+    isClickable: false,
+  },
   startIndex: 0,
 };
 
