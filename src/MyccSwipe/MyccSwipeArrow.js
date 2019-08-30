@@ -1,10 +1,10 @@
-import './CarouselArrow.css';
+import './MyccSwipeArrow.css';
 
 import React from 'react';
 import cn from 'classnames';
 import PropTypes from 'prop-types';
 
-function CarouselArrow (props) {
+function MyccSwipeArrow (props) {
   const {
     arrow,
     direction,
@@ -38,7 +38,7 @@ function CarouselArrow (props) {
   );
 }
 
-CarouselArrow.propTypes = {
+MyccSwipeArrow.propTypes = {
   arrow: PropTypes.shape({
     label: PropTypes.oneOfType([PropTypes.node, PropTypes.string]).isRequired,
     margin: PropTypes.number.isRequired,
@@ -49,4 +49,4 @@ CarouselArrow.propTypes = {
   isInactive: PropTypes.bool.isRequired,
 };
 
-export default CarouselArrow;
+export default MyccSwipeArrow;

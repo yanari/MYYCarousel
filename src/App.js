@@ -1,5 +1,5 @@
 import React from 'react';
-import YanariCarousel from './YanariCarousel';
+import MyccSwipe from './MyccSwipe';
 import './App.css';
 
 function App() {
@@ -30,24 +30,25 @@ function App() {
     );
   };
   return (
-    <YanariCarousel
-      arrows = {{
+    <MyccSwipe
+      arrowConfig = {{
         left: {
           label: '<',
           margin: 8,
-          size: 32,
+          width: 32,
         },
         right: {
           label: '>',
           margin: 8,
-          size: 32,
+          width: 32,
         },
       }}
       itemRenderer = {itemRenderer}
       items = {lista}
-      itemPreviewSize = {{
-        left: 0,
-        right: 80,
+      itemPreviewConfig = {{
+        isClickable: false,
+        widthLeft: 0,
+        widthRight: 80,
       }}
     />
   );

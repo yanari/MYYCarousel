@@ -2,9 +2,9 @@ import './index.css';
 
 import React, {Component, createRef} from 'react';
 import PropTypes from 'prop-types';
-import CarouselArrow from './CarouselArrow';
-import CarouselDots from './CarouselDots';
-import CarouselPreviewItem from './CarouselPreviewItem';
+import MyccSwipeArrow from './MyccSwipeArrow';
+import MyccSwipeDots from './MyccSwipeDots';
+import MyccSwipePreviewItem from './MyccSwipePreviewItem';
 import {
   addEventListeners,
   getBehaviorStyles,
@@ -17,7 +17,7 @@ import {
   removeEventListeners,
 } from './helper';
 
-class YanariCarousel extends Component {
+class MyccSwipe extends Component {
   constructor (props) {
     super(props);
     this.refContainer = createRef();
@@ -169,7 +169,7 @@ class YanariCarousel extends Component {
       <div className = "mycc-swipe" ref = {this.refContainer}>
         <div className = "mycc-swipe__flex-container">
           {arrowConfig && arrowConfig.left ? (
-            <CarouselArrow
+            <MyccSwipeArrow
               arrow = {arrowConfig.left}
               direction = "left"
               handleClick = {this.handleDecrementIndex}
@@ -178,7 +178,7 @@ class YanariCarousel extends Component {
           ) : null}
           <div className = "mycc-swipe__items-wrapper">
             {itemPreviewConfig && itemPreviewConfig.widthLeft ? (
-              <CarouselPreviewItem
+              <MyccSwipePreviewItem
                 handleClick = {this.handleDecrementIndex}
                 itemPreviewIsClickable = {itemPreviewConfig.isClickable}
                 itemPreviewWidth = {itemPreviewConfig.widthLeft}
@@ -207,7 +207,7 @@ class YanariCarousel extends Component {
               </div>
             </div>
             {itemPreviewConfig && itemPreviewConfig.widthRight ? (
-              <CarouselPreviewItem
+              <MyccSwipePreviewItem
                 handleClick = {this.handleIncrementIndex}
                 itemPreviewIsClickable = {itemPreviewConfig.isClickable}
                 itemPreviewWidth = {itemPreviewConfig.widthRight}
@@ -215,7 +215,7 @@ class YanariCarousel extends Component {
             ) : null}
           </div>
           {arrowConfig && arrowConfig.right ? (
-            <CarouselArrow
+            <MyccSwipeArrow
               arrow = {arrowConfig.right}
               direction = "right"
               handleClick = {this.handleIncrementIndex}
@@ -224,7 +224,7 @@ class YanariCarousel extends Component {
           ) : null}
         </div>
         {hasDots ? (
-          <CarouselDots
+          <MyccSwipeDots
             carouselIndex = {this.state.carouselIndex}
             items = {items}
             setCarouselIndex = {this.setCarouselIndex}
@@ -235,7 +235,7 @@ class YanariCarousel extends Component {
   }
 }
 
-YanariCarousel.propTypes = {
+MyccSwipe.propTypes = {
   arrowConfig: PropTypes.shape({
     left: PropTypes.shape({
       label: PropTypes.oneOfType([PropTypes.node, PropTypes.string]).isRequired,
@@ -253,7 +253,7 @@ YanariCarousel.propTypes = {
   // eslint-disable-next-line react/no-unused-prop-types
   itemMargin: PropTypes.number,
   itemPreviewConfig: PropTypes.shape({
-    isClickable: PropTypes.bool,
+    isClickable: PropTypes.bool.isRequired,
     widthLeft: PropTypes.number.isRequired,
     widthRight: PropTypes.number.isRequired,
   }),
@@ -262,7 +262,7 @@ YanariCarousel.propTypes = {
   startIndex: PropTypes.number,
 };
 
-YanariCarousel.defaultProps = {
+MyccSwipe.defaultProps = {
   arrowConfig: null,
   hasDots: false,
   itemMargin: 8,
@@ -272,4 +272,4 @@ YanariCarousel.defaultProps = {
   startIndex: 0,
 };
 
-export default YanariCarousel;
+export default MyccSwipe;

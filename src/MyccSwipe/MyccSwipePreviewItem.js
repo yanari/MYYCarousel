@@ -1,9 +1,9 @@
-import './CarouselPreviewItem.css';
+import './MyccSwipePreviewItem.css';
 
 import React from 'react';
 import PropTypes from 'prop-types';
 
-function CarouselPreviewItem (props) {
+function MyccSwipePreviewItem (props) {
   const {
     handleClick,
     itemPreviewIsClickable,
@@ -21,10 +21,10 @@ function CarouselPreviewItem (props) {
   );
 }
 
-CarouselPreviewItem.propTypes = {
+MyccSwipePreviewItem.propTypes = {
   handleClick: PropTypes.func.isRequired,
   itemPreviewIsClickable: PropTypes.bool.isRequired,
   itemPreviewWidth: PropTypes.number.isRequired,
 };
 
-export default CarouselPreviewItem;
+export default MyccSwipePreviewItem;

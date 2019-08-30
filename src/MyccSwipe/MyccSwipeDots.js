@@ -1,10 +1,10 @@
-import './CarouselDots.css';
+import './MyccSwipeDots.css';
 
 import React from 'react';
 import cn from 'classnames';
 import PropTypes from 'prop-types';
 
-function CarouselDots (props) {
+function MyccSwipeDots (props) {
   const {
     carouselIndex,
     items,
@@ -28,10 +28,10 @@ function CarouselDots (props) {
   );
 }
 
-CarouselDots.propTypes = {
+MyccSwipeDots.propTypes = {
   carouselIndex: PropTypes.number.isRequired,
   items: PropTypes.instanceOf(Object).isRequired,
   setCarouselIndex: PropTypes.func.isRequired,
 };
 
-export default CarouselDots;
+export default MyccSwipeDots;
