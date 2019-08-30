@@ -54,7 +54,7 @@ class YanariCarousel extends Component {
   };
 
   handleSwipeStart = (e) => {
-    // e.preventDefault ? e.preventDefault() : e.returnValue = false; // pra nao rolar o drag and drop de links dentro do carousel
+    // e.preventDefault ? e.preventDefault() : e.returnValue = false; // pra nao rolar o drag and drop de links dentro do carousel MAS impede o usuario de scrollar no mobile
     this.setState({
       // so ta aqui pra calcular o delta
       initialPositionX: unify(e).clientX,
